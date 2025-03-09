@@ -19,6 +19,7 @@ var AppointmentBox = React.createClass({
             cache: false,
             success: function (data) {
                 this.setState({ data: data });
+                console.log("Data: ", data);
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -59,21 +60,21 @@ var Appointmentform2 = React.createClass({
     getInitialState: function () {
         return {
             appointmentid: "",
-            serviceData: [],
+            servicedata: [],
             appointmentclientid: "",
             appointmentstart: "",
             appointmentend: "",
-            statusData: [],
+            statusdata: [],
         };
     },
 
     loadServices: function() {
         $.ajax({
-            url: '/getservices/',
+            url: '/getservice/',
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({servicedata:data});
+                this.setState({ servicedata:data });
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -173,7 +174,7 @@ var Appointmentform2 = React.createClass({
                         <tr>
                             <th>Appointment Service</th>
                             <td>
-                            <SelectServcice data={this.state.servicedata} />
+                            <SelectService data={this.state.servicedata} />
                             </td>
                         </tr> 
                         <tr>
@@ -208,7 +209,6 @@ var AppointmentList = React.createClass({
             );
                        
         });
-        
         return (
              <tbody>
                 {appointmentNodes}
@@ -216,8 +216,6 @@ var AppointmentList = React.createClass({
         );
     }
 });
-
-
 
 var Appointment = React.createClass({
 
@@ -250,13 +248,13 @@ var Appointment = React.createClass({
 
 var SelectService = React.createClass({
     render: function () {
-        var optionNodes = this.props.data.map(function (servID) {
+        var optionNodes = this.props.data.map(function (servid) {
             return (
                 <option
-                    key={servID.serviceID}
-                    value={servID.serviceID}
+                    key={servid.serviceID}
+                    value={servid.serviceID}
                 >
-                    {servID.serviceName}
+                    {servid.serviceName}
                 </option>
             );
         });
@@ -270,13 +268,13 @@ var SelectService = React.createClass({
 
 var SelectStatus = React.createClass({
     render: function () {
-        var optionNodes = this.props.data.map(function (statID) {
+        var optionNodes = this.props.data.map(function (statid) {
             return (
                 <option
-                    key={statID.appointmentStatusID}
-                    value={statID.appointmentStatusID}
+                    key={statid.appointmentStatusID}
+                    value={statid.appointmentStatusID}
                 >
-                    {statID.appointmentStatusName}
+                    {statid.appointmentStatusName}
                 </option>
             );
         });

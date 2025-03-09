@@ -8,7 +8,7 @@ var AppointmentBox = React.createClass({
             url: '/getappointment/',
             data: {
                 'appointmentid': appointmentid.value,
-                'appointmentserviceid': appointmentserviceid.value,
+                'appointmentservice': appointmentservice.value,
                 'appointmentclientid': appointmentclientid.value,
                 'appointmentstart': appointmentstart.value,
                 'appointmentend': appointmentend.value,
@@ -29,12 +29,12 @@ var AppointmentBox = React.createClass({
     componentDidMount: function () {
         this.loadAppointmentFromServer();
     },
-    updateSingleAppointmentFromServer: function (appointemnt) {
+    updateSingleAppointmentFromServer: function (appointment) {
         
         $.ajax({
             url: '/updatesingleappt/',
             dataType: 'json',
-            data: appointemnt,
+            data: appointment,
             type: 'POST',
             cache: false,
             success: function (upsingledata) {
@@ -83,17 +83,17 @@ var Appointmentform2 = React.createClass({
     getInitialState: function () {
         return {
             appointmentid: "",
-            serviceData: [],
+            servicedata: [],
             appointmentclientid: "",
             appointmentstart: "",
             appointmentend: "",
-            statusData: [],
+            statusdata: [],
         };
     },
 
     loadServices: function() {
         $.ajax({
-            url: '/getservices/',
+            url: '/getservice/',
             dataType: 'json',
             cache: false,
             success: function(data) {
@@ -198,7 +198,7 @@ var Appointmentform2 = React.createClass({
                         <tr>
                             <th>Appointment Service</th>
                             <td>
-                            <SelectServcice data={this.state.servicedata} />
+                            <SelectService data={this.state.servicedata} />
                             </td>
                         </tr>  
                         <tr>
@@ -227,17 +227,17 @@ var AppointmentUpdateform = React.createClass({
     getInitialState: function () {
         return {
             upappointmentid: "",
-            upserviceData: [],
+            upservicedata: [],
             upappointmentclientid: "",
             upappointmentstart: "",
             upappointmentend: "",
-            upstatusData: [],
+            upstatusdata: [],
         };
     },
 
     loadServices: function() {
         $.ajax({
-            url: '/getservices/',
+            url: '/getservice/',
             dataType: 'json',
             cache: false,
             success: function(data) {
@@ -451,13 +451,13 @@ var Appointment = React.createClass({
 
 var SelectService = React.createClass({
     render: function () {
-        var optionNodes = this.props.data.map(function (servID) {
+        var optionNodes = this.props.data.map(function (servid) {
             return (
                 <option
-                    key={servID.serviceID}
-                    value={servID.serviceID}
+                    key={servid.serviceID}
+                    value={servid.serviceID}
                 >
-                    {servID.serviceName}
+                    {servid.serviceName}
                 </option>
             );
         });
@@ -471,13 +471,13 @@ var SelectService = React.createClass({
 
 var SelectStatus = React.createClass({
     render: function () {
-        var optionNodes = this.props.data.map(function (statID) {
+        var optionNodes = this.props.data.map(function (statid) {
             return (
                 <option
-                    key={statID.appointmentStatusID}
-                    value={statID.appointmentStatusID}
+                    key={statid.appointmentStatusID}
+                    value={statid.appointmentStatusID}
                 >
-                    {statID.appointmentStatusName}
+                    {statid.appointmentStatusName}
                 </option>
             );
         });

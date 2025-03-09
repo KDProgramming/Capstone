@@ -203,7 +203,7 @@ var PurchasesUpdateform = React.createClass({
             uppurchaseid: "",
             upuserdata: [],
             uppurchasedate: "",
-            upstatusdata: "",
+            upstatusdata: [],
             uppurchasetotal: "",
         };
     },
@@ -278,7 +278,7 @@ var PurchasesUpdateform = React.createClass({
     }
 });
 
-var PurchaseList = React.createClass({
+var PurchasesList = React.createClass({
     render: function () {
         var purchasesNodes = this.props.data.map(function (purchases) {
             return (

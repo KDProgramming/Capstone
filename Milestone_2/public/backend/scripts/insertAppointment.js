@@ -37,7 +37,7 @@ var Appointmentform2 = React.createClass({
 
     loadServices: function() {
         $.ajax({
-            url: '/getservices/',
+            url: '/getservice/',
             dataType: 'json',
             cache: false,
             success: function(data) {

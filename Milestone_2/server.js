@@ -133,11 +133,11 @@ app.post('/appointment/', function (req, res,) {
 
 app.get('/getappointment/', function (req, res) {
     var aid = req.query.appointmentid;
-    var aserviceid = req.query.appointmentserviceid;
+    var aserviceid = req.query.appointmentservice;
     var aclientid = req.query.appointmentclientid;
     var astart = req.query.appointmentstart;
     var aend = req.query.appointmentend;
-    var astatusid = req.query.appointmentstatusid;
+    var astatusid = req.query.appointmentstatus;
 
     console.log(emailer);
 
@@ -163,8 +163,8 @@ app.get('/getappointment/', function (req, res) {
                 INNER JOIN Clients c ON a.clientID = c.clientID
                 WHERE a.appointmentID LIKE ?
                 AND a.clientID LIKE ? 
-                AND a.appointmentStart LIKE ? 
-                AND a.appointmentEnd LIKE ?`
+                AND a.appointmentStart >= ? 
+                AND a.appointmentStart < ?`
                 + serviceaddon + statusaddon;
     
     var inserts = ['%' + aid + '%', '%' + aclientid + '%', '%' + astart + '%', '%' + aend + '%', 
@@ -230,7 +230,7 @@ console.log(sql);
         });
 });
 
-app.get('/getservices/', function (req, res) {
+app.get('/getservice/', function (req, res) {
     
     var sqlsel = 'SELECT * FROM Services';
     var sql = mysql.format(sqlsel);
@@ -353,7 +353,7 @@ app.get('/getsingleclient/', function (req, res) {
     });
 });
 
-app.post('/updatesinglclient', function (req, res, ) {
+app.post('/updatesingleclient', function (req, res, ) {
 
     var cid = req.body.upclientid;
     var cuser = req.body.upclientuser;
@@ -542,11 +542,11 @@ app.get('/getproduct/', function (req, res) {
     var pprice = req.query.productprice;
     var pquantity = req.query.productquantity;
 
-    var sqlsel = `SELECT * Products 
+    var sqlsel = `SELECT * FROM Products 
                 WHERE productID LIKE ?
                 AND productName LIKE ? 
                 AND productPrice LIKE ? 
-                AND productQuanitity LIKE ?`;
+                AND productQuantity LIKE ?`;
     
     var inserts = ['%' + pid + '%', '%' + pname + '%', '%' + pprice + '%', '%' + pquantity + '%'];
 
@@ -1003,7 +1003,7 @@ app.get('/getservices/', function (req, res) {
     var sblocks = req.query.serviceblocks;
     var sprice = req.query.serviceprice;
 
-    var sqlsel = `SELECT * Services 
+    var sqlsel = `SELECT * FROM Services 
                 WHERE serviceID LIKE ?
                 AND serviceName LIKE ? 
                 AND serviceBlocks LIKE ? 

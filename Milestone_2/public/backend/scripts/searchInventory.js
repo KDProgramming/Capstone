@@ -208,7 +208,7 @@ var ProductList = React.createClass({
                     key={products.productID}
                     value={products.productID}
                 >
-                    {product.productName}
+                    {products.productName}
                 </option>
             );
         });
@@ -222,7 +222,7 @@ var ProductList = React.createClass({
 
 
 ReactDOM.render(
-    <VendorBox />,
+    <InventoryBox />,
     document.getElementById('content')
 );
 

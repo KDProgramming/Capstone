@@ -72,7 +72,7 @@ var UserBox = React.createClass({
     }
 });
 
-var UserForm2 = React.createClass({
+var Userform2 = React.createClass({
     getInitialState: function () {
         return {
             userid: "",
