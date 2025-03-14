@@ -36,6 +36,18 @@ body {
     align-items: center;
     height: 100vh;  
     font-family: 'DM Serif Display', serif;
+    height: 100%;
+    margin: 0;
+}
+
+.wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    flex: 1;
 }
 
 h1, h2 {
@@ -124,6 +136,7 @@ input[type="submit"] {
     display: flex;
     font-family: 'Gabarito', sans-serif;
     font-size: large;
+    justify-content: space-between;
 }
 
 .login-title {
@@ -134,12 +147,14 @@ input[type="submit"] {
 }
 
 nav .logo {
-    height: 70px;
+    height: 60px;
     width: auto;   
 }
 
 .nav-items {
     padding: 10px;
+    align-items: center;
+    justify-content: center;
 }
 
 .nav-item {
@@ -157,6 +172,87 @@ nav .logo {
 .nav-item:hover .dropdown {
     display: block;
     color: #ff0fcb;
+}
+
+.navSearch {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.searchIcon {
+    height: 30px;
+    width: auto;  
+    padding-right: 10px;
+}
+
+.searchBar {
+    height: 40px;
+    width: auto;  
+}
+
+.bottomNavbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 140px;
+    background-image: url('../images/NavBG.png');
+    background-repeat: repeat-x;
+    background-size: cover;
+    background-position: bottom;
+    z-index: 100;
+}
+
+.bottomNavItems {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px; 
+}
+
+.hgtcDiv {
+    padding-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-grow: 1;
+}
+
+.bottomTextDiv {
+    padding-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-grow: 1;
+}
+
+nav .topText {
+    padding-top: 20px;
+    width: auto;
+    height: 20px;
+}
+
+nav .bottomText {
+    padding-top: 20px;
+    width: auto;
+    height: 20px;
+}
+
+nav .hgtc {
+    width: auto;
+    height: 60px;
+}
+
+nav .navBG {
+    height: 100%;
+    width: auto;  
 }
 
 .dropdown {

@@ -14,29 +14,47 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/classnames/2.1.5/index.min.js"></script>
 </head>
 <body>
-    <nav class="navbar">
-        <img src="images/navLogo.png" alt="Logo" class="logo" />
-        <div class="nav-items">
-            <div class="nav-item">
-                <a href="#">Clients</a>
-                <div class="dropdown">
-                    <a href="insertClient.html">Insert Client</a>
+    <div class="wrapper">
+        <nav class="navbar">
+            <img src="images/navLogo.png" alt="Logo" class="logo" />
+            <div class="nav-items">
+                <div class="nav-item">
+                    <a href="#">Clients</a>
+                    <div class="dropdown">
+                        <a href="insertClient.html">Insert Client</a>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <a href="#">Appointments</a>
+                    <div class="dropdown">
+                        <a href="login.html">Insert Appointment</a>
+                    </div>
                 </div>
             </div>
-    
-            <div class="nav-item">
-                <a href="#">Appointments</a>
-                <div class="dropdown">
-                    <a href="login.html">Insert Appointment</a>
-                </div>
+            <div class="navSearch">
+                <img src="images/SearchIcon.png" alt="SearchIcon" class="searchIcon" />
+                <img src="images/SearchBar.png" alt="SearchBar" class="searchBar" />
             </div>
+         </nav>
+        <div id="content"></div>
+        <div class="decorative-image-container-CherryBlossom">
+        <img src="images/CherryBlossom.png" alt="Decorative Image" class="decorative-image-CherryBlossom" />
         </div>
-     </nav>
-    <div id="content"></div>
-    <div class="decorative-image-container-CherryBlossom">
-    <img src="images/CherryBlossom.png" alt="Decorative Image" class="decorative-image-CherryBlossom" />
+        <script type="text/babel" src="scripts/insertClient.js">
+        </script>
+        <nav class="bottomNavbar">
+            <img src="images/NavTopText.png" alt="TopText" class="topText" />
+            <div class="bottomNavItems">
+                <div class="bottomTextDiv">
+                    <img src="images/NavBottomText.png" alt="BottomText" class="bottomText" />
+                </div>
+                <div class="hgtcDiv">
+                    <a href="https://www.hgtc.edu/">
+                        <img src="images/HGTC.png" alt="HGTC" class="hgtc" />
+                    </a>
+                </div>
+            </div>
+        </nav>
     </div>
-    <script type="text/babel" src="scripts/insertClient.js">
-    </script>
 </body>
 </html>
