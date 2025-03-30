@@ -2,6 +2,13 @@ div {
     text-align: center;
 }
 
+.blocks {
+    text-align: left;
+    font-size: 20;
+    font-weight: bold;
+    letter-spacing: 4;
+}
+
 #theform {
     display: inline-block;
 }

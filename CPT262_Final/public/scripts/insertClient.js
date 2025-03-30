@@ -260,6 +260,8 @@ var TextInput = React.createClass({
         this.validation(event.target.value, valid);
     },
     render: function () {
+        const inputType = this.props.inputType || 'text';
+
         if (this.props.textArea) {
             return (
                 <div className={this.props.uniqueName}>
@@ -279,6 +281,7 @@ var TextInput = React.createClass({
             return (
                 <div className={this.props.uniqueName}>
                     <input
+                        type={inputType}
                         name={this.props.uniqueName}
                         id={this.props.uniqueName}
                         placeholder={this.props.text}

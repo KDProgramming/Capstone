@@ -164,7 +164,7 @@ var InventoryList = React.createClass({
                     key={inventory.inventoryID} // never forget this line!
                     invid={inventory.inventoryID}
                     invlevel={inventory.inventoryLevel}
-                    invlastupdated={inventory.inventoryLastUpdated}
+                    invlastupdated={inventory.formattedupdate}
                     invproduct={inventory.productName}
                 >
                 </Inventory>

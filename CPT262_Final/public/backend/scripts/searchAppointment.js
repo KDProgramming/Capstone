@@ -214,8 +214,8 @@ var AppointmentList = React.createClass({
                     key={appointment.appointmentID} // never forget this line!
                     apptid={appointment.appointmentID}
                     apptclient={appointment.clientEmail}
-                    apptstart={appointment.appointmentStart}
-                    apptend={appointment.appointmentEnd}
+                    apptstart={appointment.formattedStart}
+                    apptend={appointment.formattedEnd}
                     apptservice={appointment.serviceName}
                     apptstatus={appointment.appointmentStatusName}
                 >

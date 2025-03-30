@@ -196,7 +196,8 @@ var Appointmentform2 = React.createClass({
                                 name="appointmentstart" 
                                 id="appointmentstart" 
                                 value={this.state.appointmentstart} 
-                                onChange={this.handleChange}  />
+                                onChange={this.handleChange} 
+                                step="1800" />
                             </td>
                         </tr>
                         <tr>
@@ -207,7 +208,8 @@ var Appointmentform2 = React.createClass({
                                 name="appointmentend" 
                                 id="appointmentend" 
                                 value={this.state.appointmentend} 
-                                onChange={this.handleChange}  />
+                                onChange={this.handleChange}
+                                step="1800"  />
                             </td>
                         </tr>
                         <tr>
@@ -347,7 +349,8 @@ var AppointmentUpdateform = React.createClass({
                                 name="upapptstart" 
                                 id="upapptstart" 
                                 value={this.state.upapptstart} 
-                                onChange={this.handleChange}  />
+                                onChange={this.handleChange}
+                                step="1800"  />
                             </td>
                         </tr>
                         <tr>
@@ -358,7 +361,8 @@ var AppointmentUpdateform = React.createClass({
                                 name="upapptend" 
                                 id="upapptend" 
                                 value={this.state.upapptend} 
-                                onChange={this.handleChange}  />
+                                onChange={this.handleChange}
+                                step="1800"  />
                             </td>
                         </tr>  
                         <tr>
@@ -386,8 +390,8 @@ var AppointmentList = React.createClass({
                     key={appointment.appointmentID} // never forget this line!
                     apptid={appointment.appointmentID}
                     apptclient={appointment.clientEmail}
-                    apptstart={appointment.appointmentStart}
-                    apptend={appointment.appointmentEnd}
+                    apptstart={appointment.formattedStart}
+                    apptend={appointment.formattedEnd}
                     apptservice={appointment.serviceName}
                     apptstatus={appointment.appointmentStatusName}
                 >

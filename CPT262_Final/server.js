@@ -140,7 +140,12 @@ app.get('/getappointment/', function (req, res) {
     var aend = req.query.appointmentend;
     var astatus = req.query.appointmentstatus;
 
-    var sqlsel = `SELECT a.*, ap.appointmentStatusName, s.serviceName, c.clientEmail
+    var sqlsel = `SELECT a.appointmentID, 
+                ap.appointmentStatusName, 
+                s.serviceName, 
+                c.clientEmail,
+                DATE_FORMAT(a.appointmentStart, '%Y-%m-%d %H:%i:%s') AS formattedStart,
+                DATE_FORMAT(a.appointmentEnd, '%Y-%m-%d %H:%i:%s') AS formattedEnd
                 FROM Appointments a
                 INNER JOIN appointmentStatus ap ON a.appointmentStatusID = ap.appointmentStatusID
                 INNER JOIN Services s ON a.serviceID = s.serviceID
@@ -208,13 +213,14 @@ app.get('/getappointment/', function (req, res) {
     console.log(sql);
 
     con.query(sql, function(err, data) { 
-        if(err) {
+        if (err) {
             console.error(err);
             process.exit(1);
         }
         res.send(JSON.stringify(data));
     });
 });
+
 
 
 
@@ -508,7 +514,8 @@ app.get('/getinventory/', function (req, res) {
     var ilastupdated = req.query.inventorylastupdated;
     var iproduct = req.query.inventoryproduct;
 
-    var sqlsel = `SELECT i.*, p.productName
+    var sqlsel = `SELECT i.*, p.productName,
+                DATE_FORMAT(i.inventoryLastUpdated, '%Y-%m-%d %H:%i:%s') AS formattedupdate
                 FROM Inventory i
                 INNER JOIN Products p ON i.productID = p.productID
                 WHERE 1=1`;

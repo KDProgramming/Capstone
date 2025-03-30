@@ -163,7 +163,7 @@ var Inventoryform2 = React.createClass({
                                 id="inventorylastupdated" 
                                 value={this.state.inventorylastupdated} 
                                 onChange={this.handleChange} 
-                                />
+                                step="1800" />
                             </td>
                         </tr>
                         <tr>
@@ -255,8 +255,7 @@ var InventoryUpdateform = React.createClass({
                                 name="upinvlastupdated" 
                                 id="upinvlastupdated" 
                                 value={this.state.upinvlastupdated} 
-                                onChange={this.handleUpChange} 
-                                />
+                                onChange={this.handleUpChange} />
                             </td>
                         </tr>  
                     </tbody>
@@ -278,7 +277,7 @@ var InventoryList = React.createClass({
                     key={inventory.inventoryID} // never forget this line!
                     invid={inventory.inventoryID}
                     invlevel={inventory.inventoryLevel}
-                    invlastupdated={inventory.inventoryLastUpdated}
+                    invlastupdated={inventory.formattedupdate}
                     invproduct={inventory.productName}
                 >
                 </Inventory>

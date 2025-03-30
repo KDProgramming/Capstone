@@ -114,7 +114,7 @@ var Inventoryform2 = React.createClass({
                                 name="inventorylastupdated" 
                                 id="inventorylastupdated" 
                                 value={this.state.inventorylastupdated} 
-                                onChange={this.handleChange}  />
+                                onChange={this.handleChange} />
                             </td>
                         </tr>
                         <tr>

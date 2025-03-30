@@ -30,7 +30,8 @@ var Appointmentform2 = React.createClass({
             appointmentend: "",
             servicedata: [],
             clientdata: [],
-            statusdata: []
+            statusdata: [],
+            selectedService: ""
         };
     },
 
@@ -130,6 +131,15 @@ var Appointmentform2 = React.createClass({
                             </td>
                         </tr>
                         <tr>
+                            <th>Blocks</th>
+                            <td>
+                                <text>Please Select Your Start and End Dates Accordingly: </text><br/>
+                                <br/><GetBlocks data={this.state.servicedata} selectedService={this.state.selectedService} /><br/>
+                                <text>1 Block: 30 Minutes</text><br/>
+                                <text>2 Blocks: 1 Hour</text><br/>
+                            </td>
+                        </tr>
+                        <tr>
                             <th>Status</th>
                             <td>
                                 <SelectStatus data={this.state.statusdata} />
@@ -143,7 +153,8 @@ var Appointmentform2 = React.createClass({
                                 name="appointmentstart" 
                                 id="appointmentstart" 
                                 value={this.state.appointmentstart} 
-                                onChange={this.handleChange}  />
+                                onChange={this.handleChange}
+                                step="1800"  />
                             </td>
                             </tr>
                             <tr>
@@ -154,7 +165,8 @@ var Appointmentform2 = React.createClass({
                                     name="appointmentend" 
                                     id="appointmentend" 
                                     value={this.state.appointmentend} 
-                                    onChange={this.handleChange} />
+                                    onChange={this.handleChange}
+                                    step="1800" />
                                 </td>
                             </tr>
                     </tbody>
@@ -180,6 +192,7 @@ var SelectClient = React.createClass({
         });
         return (
             <select name="apptclient" id="apptclient">
+                <option value="">Select a Client</option>
                 {optionNodes}
             </select>
         );
@@ -190,18 +203,34 @@ var SelectService = React.createClass({
     render: function () {
         var optionNodes = this.props.data.map(function (servid) {
             return (
-                <option
-                    key={servid.serviceID}
+                <option 
+                    key={servid.serviceID} 
                     value={servid.serviceID}
                 >
                     {servid.serviceName}
                 </option>
             );
         });
+
         return (
-            <select name="apptservice" id="apptservice">
+            <select name="apptservice" id="apptservice" onChange={this.props.onChange}>
+                <option value="">Select a Service</option>
                 {optionNodes}
             </select>
+        );
+    }
+});
+
+var GetBlocks = React.createClass({
+    render: function () {
+        return (
+            <div>
+                {this.props.data.map((service) => (
+                    <div className="blocks" key={service.serviceID}>
+                        <span>{service.serviceName}: {service.serviceBlocks} Block(s)</span>
+                    </div>
+                ))}
+            </div>
         );
     }
 });
@@ -220,6 +249,7 @@ var SelectStatus = React.createClass({
         });
         return (
             <select name="apptstatus" id="apptstatus">
+                <option value="">Select a Status</option>
                 {optionNodes}
             </select>
         );
