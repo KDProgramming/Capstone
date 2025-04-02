@@ -1,4 +1,22 @@
+var cliuser = 0;
 var AppointmentBox = React.createClass({
+    getInitialState: function() {
+        return { viewthepage: 0 };
+    }, 
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinfront/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                cliuser = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
+    },  
     handleAppointmentSubmit: function (appointment) {
         $.ajax({ 
             url: '/appointment/',
@@ -13,35 +31,46 @@ var AppointmentBox = React.createClass({
             }.bind(this)
         });
     },
+    componentDidMount: function () {
+        this.loadAllowLogin();
+    },
     render: function () {
-        return (
-            <div className="AppointmentBox">
-                <h1>Insert Appointment</h1>
-                <Appointmentform2 onAppointmentSubmit={this.handleAppointmentSubmit}/>
-            </div>
-        );
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="login.html">Access Login Page Here</a>
+                </div>
+            );
+        } else { 
+            return (
+                <div className="AppointmentBox">
+                    <h1>Insert Appointment</h1>
+                    <Appointmentform2 onAppointmentSubmit={this.handleAppointmentSubmit}/>
+                </div>
+            );
+        }
     }
 });
 
 var Appointmentform2 = React.createClass({
     getInitialState: function () {
         return {
-            appointmentstart: "",
-            appointmentend: "",
-            servicedata: [],
-            clientdata: [],
-            statusdata: [],
-            selectedService: ""
+            kd_appointmentstart: "",
+            kd_appointmentend: "",
+            kd_servicedata: [],
+            kd_clientdata: [],
+            kd_statusdata: [],
+            kd_selectedService: ""
         };
-    },
-
+    },  
     loadClients: function() {
         $.ajax({
             url: '/getclients/',
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({ clientdata:data });
+                this.setState({ kd_clientdata:data });
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -54,7 +83,7 @@ var Appointmentform2 = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({servicedata:data});
+                this.setState({kd_servicedata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -67,7 +96,7 @@ var Appointmentform2 = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({ statusdata:data});
+                this.setState({ kd_statusdata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -83,21 +112,21 @@ var Appointmentform2 = React.createClass({
     handleSubmit: function (e) { 
         e.preventDefault();
         
-        var appointmentclient = apptclient.value;
-        var appointmentservice = apptservice.value;
-        var appointmentstatus = apptstatus.value;
-        var appointmentstart = this.state.appointmentstart;
-        var appointmentend = this.state.appointmentend;
+        var kd_appointmentclient = apptclient.value;
+        var kd_appointmentservice = apptservice.value;
+        var kd_appointmentstatus = apptstatus.value;
+        var kd_appointmentstart = this.state.kd_appointmentstart;
+        var kd_appointmentend = this.state.kd_appointmentend;
 
-        console.log("Start Date: " + appointmentstart);
-        console.log("End Date: " + appointmentend);
+        console.log("Start Date: " + kd_appointmentstart);
+        console.log("End Date: " + kd_appointmentend);
 
         this.props.onAppointmentSubmit({ 
-            appointmentclient: appointmentclient,
-            appointmentservice: appointmentservice,
-            appointmentstatus: appointmentstatus,
-            appointmentstart: appointmentstart,
-            appointmentend: appointmentend
+            kd_appointmentclient: kd_appointmentclient,
+            kd_appointmentservice: kd_appointmentservice,
+            kd_appointmentstatus: kd_appointmentstatus,
+            kd_appointmentstart: kd_appointmentstart,
+            kd_appointmentend: kd_appointmentend
         });
     },
 
@@ -121,20 +150,20 @@ var Appointmentform2 = React.createClass({
                         <tr>
                             <th>Client Email</th>
                             <td>
-                                <SelectClient data={this.state.clientdata} />
+                                <SelectClient data={this.state.kd_clientdata} />
                             </td>
                         </tr>
                         <tr>
                             <th>Service</th>
                             <td>
-                                <SelectService data={this.state.servicedata} />
+                                <SelectService data={this.state.kd_servicedata} />
                             </td>
                         </tr>
                         <tr>
                             <th>Blocks</th>
                             <td>
                                 <text>Please Select Your Start and End Dates Accordingly: </text><br/>
-                                <br/><GetBlocks data={this.state.servicedata} selectedService={this.state.selectedService} /><br/>
+                                <br/><GetBlocks data={this.state.kd_servicedata} selectedService={this.state.kd_selectedService} /><br/>
                                 <text>1 Block: 30 Minutes</text><br/>
                                 <text>2 Blocks: 1 Hour</text><br/>
                             </td>
@@ -142,7 +171,7 @@ var Appointmentform2 = React.createClass({
                         <tr>
                             <th>Status</th>
                             <td>
-                                <SelectStatus data={this.state.statusdata} />
+                                <SelectStatus data={this.state.kd_statusdata} />
                             </td>
                         </tr>
                         <tr>
@@ -150,9 +179,9 @@ var Appointmentform2 = React.createClass({
                             <td>
                                 <input 
                                 type = "datetime-local" 
-                                name="appointmentstart" 
-                                id="appointmentstart" 
-                                value={this.state.appointmentstart} 
+                                name="kd_appointmentstart" 
+                                id="kd_appointmentstart" 
+                                value={this.state.kd_appointmentstart} 
                                 onChange={this.handleChange}
                                 step="1800"  />
                             </td>
@@ -162,9 +191,9 @@ var Appointmentform2 = React.createClass({
                                 <td>
                                     <input 
                                     type = "datetime-local" 
-                                    name="appointmentend" 
-                                    id="appointmentend" 
-                                    value={this.state.appointmentend} 
+                                    name="kd_appointmentend" 
+                                    id="kd_appointmentend" 
+                                    value={this.state.kd_appointmentend} 
                                     onChange={this.handleChange}
                                     step="1800" />
                                 </td>
@@ -181,10 +210,16 @@ var Appointmentform2 = React.createClass({
 var SelectClient = React.createClass({
     render: function () {
         var optionNodes = this.props.data.map(function (cliid) {
+            console.log("Current Client: " + cliuser)
+            var selValue = false;
+            if (cliuser == cliid.clientID) {
+                selValue = true;
+            }
             return (
                 <option
                     key={cliid.clientID}
                     value={cliid.clientID}
+                    selected={selValue}
                 >
                     {cliid.clientEmail}
                 </option>
@@ -237,16 +272,22 @@ var GetBlocks = React.createClass({
 
 var SelectStatus = React.createClass({
     render: function () {
-        var optionNodes = this.props.data.map(function (statid) {
+        var scheduledStatus = this.props.data.filter(function (statid) {
+            return statid.appointmentStatusName === "Scheduled";
+        });
+
+        var optionNodes = scheduledStatus.map(function (statid) {
             return (
                 <option
                     key={statid.appointmentStatusID}
                     value={statid.appointmentStatusID}
+                    selected={true}
                 >
                     {statid.appointmentStatusName}
                 </option>
             );
         });
+
         return (
             <select name="apptstatus" id="apptstatus">
                 <option value="">Select a Status</option>

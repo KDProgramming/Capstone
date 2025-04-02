@@ -1,4 +1,39 @@
+var ususer = 0;
 var UserBox = React.createClass({
+    getInitialState: function() {
+        return { viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
+    },
+    componentDidMount: function () {
+        this.loadAllowLogin();
+    }, 
+    handleAppointmentSubmit: function (appointment) {
+        $.ajax({ 
+            url: '/appointment/',
+            dataType: 'json',
+            type: 'POST',
+            data: appointment,
+            success: function (data) {
+                this.setState({ data: data}); 
+            }.bind(this), 
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
+    }, 
     handleUserSubmit: function (user) {
         $.ajax({
             url: '/user/',
@@ -14,22 +49,31 @@ var UserBox = React.createClass({
         });
     },
     render: function () {
-        return (
-            <div className="UserBox">
-                <h1>Insert User</h1>
-                <Userform2 onUserSubmit={this.handleUserSubmit}/>
-            </div>
-        );
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
+                </div>
+            );
+        } else { 
+            return (
+                <div className="UserBox">
+                    <h1>Insert User</h1>
+                    <Userform2 onUserSubmit={this.handleUserSubmit}/>
+                </div>
+            );
+        }
     }
 });
 
 var Userform2 = React.createClass({
     getInitialState: function () {
         return {
-            categorydata: [],
-            useremail: "",
-            userpw: "",
-            userpw2: "",
+            kd_categorydata: [],
+            kd_useremail: "",
+            kd_userpw: "",
+            kd_userpw2: "",
         };
     },
     loadCategory: function() {
@@ -38,7 +82,7 @@ var Userform2 = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({categorydata:data});
+                this.setState({kd_categorydata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -52,25 +96,25 @@ var Userform2 = React.createClass({
     handleSubmit: function (e) { 
         e.preventDefault(); 
         
-        var usercategoryid = uscategory.value;
-        var useremail = this.state.useremail.trim();
-        var userpw = this.state.userpw.trim();
-        var userpw2 = this.state.userpw2.trim();
+        var kd_usercategoryid = uscategory.value;
+        var kd_useremail = this.state.kd_useremail.trim();
+        var kd_userpw = this.state.kd_userpw.trim();
+        var kd_userpw2 = this.state.kd_userpw2.trim();
 
-        if (!useremail || !userpw || !userpw2) {
+        if (!kd_useremail || !kd_userpw || !kd_userpw2) {
             alert("Field Missing");
             return;
         }
-        if (userpw != userpw2) {
+        if (kd_userpw != kd_userpw2) {
             alert("Passwords Do Not Match!");
             return;
         }
  
         this.props.onUserSubmit({ 
-            usercategoryid: usercategoryid,
-            useremail: useremail,
-            userpw: userpw,
-            userpw2: userpw2,
+            kd_usercategoryid: kd_usercategoryid,
+            kd_useremail: kd_useremail,
+            kd_userpw: kd_userpw,
+            kd_userpw2: kd_userpw2,
         });
     },
 
@@ -93,13 +137,13 @@ var Userform2 = React.createClass({
                             <th>Email</th>
                             <td>
                                 <TextInput
-                                    value={this.state.useremail}
-                                    uniqueName="useremail"
+                                    value={this.state.kd_useremail}
+                                    uniqueName="kd_useremail"
                                     textArea={false}
                                     required={true}
                                     minCharacters={2}
                                     validate={this.commonValidate}
-                                    onChange={this.setValue.bind(this, 'useremail')}
+                                    onChange={this.setValue.bind(this, 'kd_useremail')}
                                     errorMessage="User Name is invalid"
                                     emptyMessage="User Name is required" />
                             </td>
@@ -107,7 +151,7 @@ var Userform2 = React.createClass({
                         <tr>
                             <th>Category</th>
                             <td>
-                            <CategoryList data={this.state.categorydata} />
+                            <CategoryList data={this.state.kd_categorydata} />
                             </td>
                         </tr>
                         <tr>
@@ -115,12 +159,12 @@ var Userform2 = React.createClass({
                             <td>
                                 <TextInput
                                     inputType="password"
-                                    value={this.state.userpw}
-                                    uniqueName="userpw"
+                                    value={this.state.kd_userpw}
+                                    uniqueName="kd_userpw"
                                     textArea={false}
                                     required={true}
                                     validate={this.commonValidate}
-                                    onChange={this.setValue.bind(this, 'userpw')}
+                                    onChange={this.setValue.bind(this, 'kd_userpw')}
                                     errorMessage="Password is Invalid" 
                                     emptyMessage="Password is Required" />
                             </td>
@@ -130,12 +174,12 @@ var Userform2 = React.createClass({
                             <td>
                                 <TextInput
                                     inputType="password"
-                                    value={this.state.userpw2}
-                                    uniqueName="userpw2"
+                                    value={this.state.kd_userpw2}
+                                    uniqueName="kd_userpw2"
                                     textArea={false}
                                     required={true}
                                     validate={this.commonValidate}
-                                    onChange={this.setValue.bind(this, 'userpw2')}
+                                    onChange={this.setValue.bind(this, 'kd_userpw2')}
                                     errorMessage="Password is Invalid" 
                                     emptyMessage="Password Verification is Required" />
                             </td>

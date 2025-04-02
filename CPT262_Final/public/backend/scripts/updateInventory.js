@@ -1,15 +1,33 @@
+var ususer = 0;
 var InventoryBox = React.createClass({
     getInitialState: function () {
-        return { data: [] };
+        return { data: [], viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                if (data !== 0) {
+                    this.loadInventoryFromServer();
+                }
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
     },
     loadInventoryFromServer: function () {
         $.ajax({
             url: '/getinventory/',
             data: {
-                'inventoryid': inventoryid.value,
-                'inventorylevel': inventorylevel.value,
-                'inventorylastupdated': inventorylastupdated.value,
-                'inventoryproduct': invproduct.value,         
+                'kd_inventoryid': kd_inventoryid.value,
+                'kd_inventorylevel': kd_inventorylevel.value,
+                'kd_inventorylastupdated': kd_inventorylastupdated.value,
+                'kd_inventoryproduct': invproduct.value,         
             },
             
             dataType: 'json',
@@ -41,46 +59,56 @@ var InventoryBox = React.createClass({
         window.location.reload(true);
     },
     componentDidMount: function () {
+        this.loadAllowLogin();
         this.loadInventoryFromServer();
     },
 
     render: function () {
-        return (
-            <div>
-                <h1>Update Inventory</h1>
-                <Inventoryform2 onInventorySubmit={this.loadInventoryFromServer} />
-                <br />
-                <div id = "theresults">
-                    <div id = "theleft">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Level</th>
-                                <th>Product</th>
-                                <th>Last Updated</th>
-                                <th></th>
-                            </tr>
-                         </thead>
-                        <InventoryList data={this.state.data} />
-                    </table>
-                    </div>
-                    <div id="theright">
-                        <InventoryUpdateform onUpdateSubmit={this.updateSingleInventoryFromServer} />
-                    </div>                
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
                 </div>
-            </div>
-        );
+            );
+        } else { 
+            return (
+                <div>
+                    <h1>Update Inventory</h1>
+                    <Inventoryform2 onInventorySubmit={this.loadInventoryFromServer} />
+                    <br />
+                    <div id = "theresults">
+                        <div id = "theleft">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Level</th>
+                                    <th>Product</th>
+                                    <th>Last Updated</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <InventoryList data={this.state.data} />
+                        </table>
+                        </div>
+                        <div id="theright">
+                            <InventoryUpdateform onUpdateSubmit={this.updateSingleInventoryFromServer} />
+                        </div>                
+                    </div>
+                </div>
+            );
+        }
     }
 });
 
 var Inventoryform2 = React.createClass({
     getInitialState: function () {
         return {
-            inventoryid: "",
-            inventorylevel: "",
-            inventorylastupdated: "",
-            productdata: [],
+            kd_inventoryid: "",
+            kd_inventorylevel: "",
+            kd_inventorylastupdated: "",
+            kd_productdata: [],
         };
     },
 
@@ -90,7 +118,7 @@ var Inventoryform2 = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({productdata:data});
+                this.setState({kd_productdata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -104,16 +132,16 @@ var Inventoryform2 = React.createClass({
     handleSubmit: function (e) {
         e.preventDefault();
 
-        var inventoryid = this.state.inventoryid.trim();
-        var inventorylevel = this.state.inventorylevel.trim();
-        var inventorylastupdated = this.state.inventorylastupdated.trim();
-        var inventoryproduct = invproduct.value;
+        var kd_inventoryid = this.state.kd_inventoryid.trim();
+        var kd_inventorylevel = this.state.kd_inventorylevel.trim();
+        var kd_inventorylastupdated = this.state.kd_inventorylastupdated.trim();
+        var kd_inventoryproduct = invproduct.value;
 
         this.props.onInventorySubmit({ 
-            inventoryid: inventoryid, 
-            inventorylevel: inventorylevel, 
-            inventorylastupdated: inventorylastupdated, 
-            inventoryproduct: inventoryproduct,
+            kd_inventoryid: kd_inventoryid, 
+            kd_inventorylevel: kd_inventorylevel, 
+            kd_inventorylastupdated: kd_inventorylastupdated, 
+            kd_inventoryproduct: kd_inventoryproduct,
         });
 
     },
@@ -136,9 +164,9 @@ var Inventoryform2 = React.createClass({
                             <td>
                                 <input 
                                 type="text" 
-                                name="inventoryid" 
-                                id="inventoryid" 
-                                value={this.state.inventoryid} 
+                                name="kd_inventoryid" 
+                                id="kd_inventoryid" 
+                                value={this.state.kd_inventoryid} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -147,9 +175,9 @@ var Inventoryform2 = React.createClass({
                             <th>Inventory Level</th>
                             <td>
                                 <input 
-                                name="inventorylevel" 
-                                id="inventorylevel" 
-                                value={this.state.inventorylevel} 
+                                name="kd_inventorylevel" 
+                                id="kd_inventorylevel" 
+                                value={this.state.kd_inventorylevel} 
                                 onChange={this.handleChange}  
                                 />
                             </td>
@@ -159,9 +187,9 @@ var Inventoryform2 = React.createClass({
                             <td>
                                 <input 
                                 type = "datetime-local" 
-                                name="inventorylastupdated" 
-                                id="inventorylastupdated" 
-                                value={this.state.inventorylastupdated} 
+                                name="kd_inventorylastupdated" 
+                                id="kd_inventorylastupdated" 
+                                value={this.state.kd_inventorylastupdated} 
                                 onChange={this.handleChange} 
                                 step="1800" />
                             </td>
@@ -169,7 +197,7 @@ var Inventoryform2 = React.createClass({
                         <tr>
                             <th>Inventory Product</th>
                             <td>
-                                <ProductList data={this.state.productdata} /> 
+                                <ProductList data={this.state.kd_productdata} /> 
                             </td>
                         </tr>
                     </tbody>
@@ -184,10 +212,10 @@ var Inventoryform2 = React.createClass({
 var InventoryUpdateform = React.createClass({
     getInitialState: function () {
         return {
-            upinventoryid: "",
-            upinventorylevel: "",
-            upproductdata: [],
-            upinventorylastupdated: "",
+            kd_upinventoryid: "",
+            kd_upinventorylevel: "",
+            kd_upproductdata: [],
+            kd_upinventorylastupdated: "",
         };
     },
 
@@ -197,7 +225,7 @@ var InventoryUpdateform = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({upproductdata:data});
+                this.setState({kd_upproductdata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -211,16 +239,16 @@ var InventoryUpdateform = React.createClass({
     handleUpSubmit: function (e) {
         e.preventDefault();
 
-        var upinventoryid = upinvid.value;
-        var upinventorylevel = upinvlevel.value;
-        var upinventoryproduct = upinvproduct.value;
-        var upinventorylastupdated = upinvlastupdated.value;
+        var kd_upinventoryid = kd_upinvid.value;
+        var kd_upinventorylevel = kd_upinvlevel.value;
+        var kd_upinventoryproduct = upinvproduct.value;
+        var kd_upinventorylastupdated = kd_upinvlastupdated.value;
 
         this.props.onUpdateSubmit({ 
-            upinventoryid: upinventoryid, 
-            upinventorylevel: upinventorylevel, 
-            upinventoryproduct: upinventoryproduct, 
-            upinventorylastupdated: upinventorylastupdated, 
+            kd_upinventoryid: kd_upinventoryid, 
+            kd_upinventorylevel: kd_upinventorylevel, 
+            kd_upinventoryproduct: kd_upinventoryproduct, 
+            kd_upinventorylastupdated: kd_upinventorylastupdated, 
         });
     },
     
@@ -235,9 +263,9 @@ var InventoryUpdateform = React.createClass({
                             <th>Level</th>
                             <td>
                                 <input 
-                                name="upinvlevel" 
-                                id="upinvlevel" 
-                                value={this.state.upinvlevel} 
+                                name="kd_upinvlevel" 
+                                id="kd_upinvlevel" 
+                                value={this.state.kd_upinvlevel} 
                                 onChange={this.handleUpChange} 
                                 />
                             </td>
@@ -245,22 +273,22 @@ var InventoryUpdateform = React.createClass({
                         <tr>
                             <th>Product</th>
                             <td>
-                                <ProductUpdateList data={this.state.upproductdata} /> 
+                                <ProductUpdateList data={this.state.kd_upproductdata} /> 
                             </td>
                         </tr>
                         <tr>
                             <th>Last Updated</th>
                             <td>
                                 <input 
-                                name="upinvlastupdated" 
-                                id="upinvlastupdated" 
-                                value={this.state.upinvlastupdated} 
+                                name="kd_upinvlastupdated" 
+                                id="kd_upinvlastupdated" 
+                                value={this.state.kd_upinvlastupdated} 
                                 onChange={this.handleUpChange} />
                             </td>
                         </tr>  
                     </tbody>
                 </table><br />
-                        <input type="hidden" name="upinvid" id="upinvid" onChange={this.handleUpChange} />
+                        <input type="hidden" name="kd_upinvid" id="kd_upinvid" onChange={this.handleUpChange} />
                         <input type="submit" value="Update Inventory" />
                     </form>
                 </div>
@@ -298,8 +326,8 @@ var InventoryList = React.createClass({
 var Inventory = React.createClass({
     getInitialState: function () {
         return {
-            upinvid: "",
-            singledata: []
+            kd_upinvid: "",
+            kd_singledata: []
         };
     },
     updateRecord: function (e) {
@@ -312,18 +340,18 @@ var Inventory = React.createClass({
         $.ajax({
             url: '/getsingleinventory/',
             data: {
-                'upinvid': theupinvid
+                'kd_upinvid': theupinvid
             },
             dataType: 'json',
             cache: false,
             success: function (data) {
-                this.setState({ singledata: data });
-                console.log(this.state.singledata);
-                var populateInventory = this.state.singledata.map(function (inventory) {
-                    upinvid.value = theupinvid;
-                    upinvlevel.value = inventory.inventoryLevel;
+                this.setState({ kd_singledata: data });
+                console.log(this.state.kd_singledata);
+                var populateInventory = this.state.kd_singledata.map(function (inventory) {
+                    kd_upinvid.value = theupinvid;
+                    kd_upinvlevel.value = inventory.inventoryLevel;
                     upinvproduct.value = inventory.productID;
-                    upinvlastupdated.value = inventory.inventoryLastUpdated;
+                    kd_upinvlastupdated.value = inventory.inventoryLastUpdated;
 
                 });
             }.bind(this),

@@ -1,4 +1,39 @@
+var ususer = 0;
 var PurchasesBox = React.createClass({
+    getInitialState: function() {
+        return { viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
+    },
+    componentDidMount: function () {
+        this.loadAllowLogin();
+    }, 
+    handleAppointmentSubmit: function (appointment) {
+        $.ajax({ 
+            url: '/appointment/',
+            dataType: 'json',
+            type: 'POST',
+            data: appointment,
+            success: function (data) {
+                this.setState({ data: data}); 
+            }.bind(this), 
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
+    }, 
     handlePurchasesSubmit: function (purchases) {
         $.ajax({ 
             url: '/purchases/',
@@ -14,22 +49,31 @@ var PurchasesBox = React.createClass({
         });
     },
     render: function () {
-        return (
-            <div className="PurchasesBox">
-                <h1>Insert Purchase</h1>
-                <Purchasesform2 onPurchasesSubmit={this.handlePurchasesSubmit}/>
-            </div>
-        );
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
+                </div>
+            );
+        } else { 
+            return (
+                <div className="PurchasesBox">
+                    <h1>Insert Purchase</h1>
+                    <Purchasesform2 onPurchasesSubmit={this.handlePurchasesSubmit}/>
+                </div>
+            );
+        }
     }
 });
 
 var Purchasesform2 = React.createClass({
     getInitialState: function () {
         return {
-            userdata: [],
-            purchasedate: "",
-            statusdata: [],
-            purchasetotal: "",
+            kd_userdata: [],
+            kd_purchasedate: "",
+            kd_statusdata: [],
+            kd_purchasetotal: "",
         };
     },
 
@@ -39,7 +83,7 @@ var Purchasesform2 = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({userdata:data});
+                this.setState({kd_userdata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -52,7 +96,7 @@ var Purchasesform2 = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({statusdata:data});
+                this.setState({kd_statusdata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -67,22 +111,22 @@ var Purchasesform2 = React.createClass({
     handleSubmit: function (e) { 
         e.preventDefault(); 
         
-        var purchaseuser = puruser.value;
-        var purchasedate = this.state.purchasedate;
-        var purchasestatus = purstatus.value;
-        var purchasetotal = this.state.purchasetotal.trim();
+        var kd_purchaseuser = puruser.value;
+        var kd_purchasedate = this.state.kd_purchasedate;
+        var kd_purchasestatus = purstatus.value;
+        var kd_purchasetotal = this.state.kd_purchasetotal.trim();
 
         
-        if (!purchasedate || !purchasetotal) {
+        if (!kd_purchasedate || !kd_purchasetotal) {
             console.log("Field Missing");
             return;
         }
 
         this.props.onPurchasesSubmit({ 
-            purchaseuser: purchaseuser,
-            purchasedate: purchasedate,
-            purchasestatus: purchasestatus,
-            purchasetotal: purchasetotal,
+            kd_purchaseuser: kd_purchaseuser,
+            kd_purchasedate: kd_purchasedate,
+            kd_purchasestatus: kd_purchasestatus,
+            kd_purchasetotal: kd_purchasetotal,
         });
     },
     handleChange: function (event) {
@@ -113,7 +157,7 @@ var Purchasesform2 = React.createClass({
                         <tr>
                             <th>Purchaser Email</th>
                             <td>
-                                <UserList data={this.state.userdata} />
+                                <UserList data={this.state.kd_userdata} />
                             </td>
                         </tr>
                         <tr>
@@ -121,29 +165,29 @@ var Purchasesform2 = React.createClass({
                             <td>
                             <input 
                                 type = "datetime-local" 
-                                name="purchasedate" 
-                                id="purchasedate" 
-                                value={this.state.purchasedate} 
+                                name="kd_purchasedate" 
+                                id="kd_purchasedate" 
+                                value={this.state.kd_purchasedate} 
                                 onChange={this.handleChange}  />
                             </td>
                         </tr>
                         <tr>
                             <th>Purchase Status</th>
                             <td>
-                            <StatusList data={this.state.statusdata} />
+                            <StatusList data={this.state.kd_statusdata} />
                             </td>
                         </tr>
                         <tr>
                             <th>Purchase Total</th>
                             <td>
                                 <TextInput
-                                    value={this.state.purchasetotal}
-                                    uniqueName="purchasetotal"
+                                    value={this.state.kd_purchasetotal}
+                                    uniqueName="kd_purchasetotal"
                                     textArea={false}
                                     required={true}
                                     minCharacters={1}
                                     validate={this.validateDollars}
-                                    onChange={this.setValue.bind(this, 'purchasetotal')}
+                                    onChange={this.setValue.bind(this, 'kd_purchasetotal')}
                                     errorMessage="Total is invalid"
                                     emptyMessage="Total is required" />
                             </td>
@@ -171,6 +215,7 @@ var UserList = React.createClass({
         });
         return (
             <select name="puruser" id="puruser">
+                <option value="0"></option>
                 {optionNodes}
             </select>
         );
@@ -191,6 +236,7 @@ var StatusList = React.createClass({
         });
         return (
             <select name="purstatus" id="purstatus">
+                <option value="0"></option>
                 {optionNodes}
             </select>
         );

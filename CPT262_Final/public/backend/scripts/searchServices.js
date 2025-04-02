@@ -1,15 +1,33 @@
+var ususer = 0;
 var ServicesBox = React.createClass({
     getInitialState: function () {
-        return { data: [] };
+        return { data: [], viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                if (data !== 0) {
+                    this.loadServicesFromServer();
+                }
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
     },
     loadServicesFromServer: function () {
         $.ajax({
             url: '/getservices/',
             data: {
-                'serviceid': serviceid.value,
-                'servicename': servicename.value,
-                'serviceblocks': serviceblocks.value,
-                'serviceprice': serviceprice.value,          
+                'kd_serviceid': kd_serviceid.value,
+                'kd_servicename': kd_servicename.value,
+                'kd_serviceblocks': kd_serviceblocks.value,
+                'kd_serviceprice': kd_serviceprice.value,          
             },
             
             dataType: 'json',
@@ -24,55 +42,65 @@ var ServicesBox = React.createClass({
 
     },
     componentDidMount: function () {
+        this.loadAllowLogin();
         this.loadServicesFromServer();
     },
 
     render: function () {
-        return (
-            <div>
-                <h1>Services</h1>
-                <Servicesform2 onServicesSubmit={this.loadServicesFromServer} />
-                <br />
-                <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Blocks</th>
-                                <th>Price</th>
-                            </tr>
-                         </thead>
-                        <ServicesList data={this.state.data} />
-                    </table>
-                
-            </div>
-        );
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
+                </div>
+            );
+        } else { 
+            return (
+                <div>
+                    <h1>Services</h1>
+                    <Servicesform2 onServicesSubmit={this.loadServicesFromServer} />
+                    <br />
+                    <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Blocks</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <ServicesList data={this.state.data} />
+                        </table>
+                    
+                </div>
+            );
+        }
     }
 });
 
 var Servicesform2 = React.createClass({
     getInitialState: function () {
         return {
-            serviceid: "",
-            servicename: "",
-            serviceblocks: "",
-            serviceprice: "",
+            kd_serviceid: "",
+            kd_servicename: "",
+            kd_serviceblocks: "",
+            kd_serviceprice: "",
         };
     },
 
     handleSubmit: function (e) {
         e.preventDefault();
 
-        var serviceid = this.state.serviceid.trim();
-        var servicename = this.state.servicename.trim();
-        var serviceblocks = this.state.serviceblocks.trim();
-        var serviceprice = this.state.serviceprice.trim();
+        var kd_serviceid = this.state.kd_serviceid.trim();
+        var kd_servicename = this.state.kd_servicename.trim();
+        var kd_serviceblocks = this.state.kd_serviceblocks.trim();
+        var kd_serviceprice = this.state.kd_serviceprice.trim();
 
         this.props.onServicesSubmit({ 
-            serviceid: serviceid, 
-            servicename: servicename, 
-            serviceblocks: serviceblocks, 
-            serviceprice: serviceprice,
+            kd_serviceid: kd_serviceid, 
+            kd_servicename: kd_servicename, 
+            kd_serviceblocks: kd_serviceblocks, 
+            kd_serviceprice: kd_serviceprice,
         });
     },
 
@@ -94,9 +122,9 @@ var Servicesform2 = React.createClass({
                             <td>
                                 <input 
                                 type="text" 
-                                name="serviceid" 
-                                id="serviceid" 
-                                value={this.state.serviceid} 
+                                name="kd_serviceid" 
+                                id="kd_serviceid" 
+                                value={this.state.kd_serviceid} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -105,9 +133,9 @@ var Servicesform2 = React.createClass({
                             <th>Service Name</th>
                             <td>
                                 <input 
-                                name="servicename" 
-                                id="servicename" 
-                                value={this.state.servicename} 
+                                name="kd_servicename" 
+                                id="kd_servicename" 
+                                value={this.state.kd_servicename} 
                                 onChange={this.handleChange}  
                                 />
                             </td>
@@ -116,9 +144,9 @@ var Servicesform2 = React.createClass({
                             <th>Service Blocks</th>
                             <td>
                                 <input 
-                                name="serviceblocks" 
-                                id="serviceblocks" 
-                                value={this.state.serviceblocks} 
+                                name="kd_serviceblocks" 
+                                id="kd_serviceblocks" 
+                                value={this.state.kd_serviceblocks} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -127,9 +155,9 @@ var Servicesform2 = React.createClass({
                             <th>Service Price</th>
                             <td>
                                 <input 
-                                name="serviceprice" 
-                                id="serviceprice" 
-                                value={this.state.serviceprice} 
+                                name="kd_serviceprice" 
+                                id="kd_serviceprice" 
+                                value={this.state.kd_serviceprice} 
                                 onChange={this.handleChange}  
                                 />
                             </td>

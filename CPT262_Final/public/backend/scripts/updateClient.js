@@ -1,16 +1,34 @@
+var ususer = 0;
 var ClientBox = React.createClass({
     getInitialState: function () {
-        return { data: [] };
+        return { data: [], viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                if (data !== 0) {
+                    this.loadClientsFromServer();
+                }
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
     },
     loadClientsFromServer: function () {
         $.ajax({
             url: '/getclient/',
             data: {
-                'clientid': clientid.value,
-                'clientemail': clientemail.value,
-                'clientfname': clientfname.value,
-                'clientlname': clientlname.value,
-                'clientphone': clientphone.value,         
+                'kd_clientid': kd_clientid.value,
+                'kd_clientemail': kd_clientemail.value,
+                'kd_clientfname': kd_clientfname.value,
+                'kd_clientlname': kd_clientlname.value,
+                'kd_clientphone': kd_clientphone.value,         
             },
             
             dataType: 'json',
@@ -41,66 +59,76 @@ var ClientBox = React.createClass({
         window.location.reload(true);
     },
     componentDidMount: function () {
+        this.loadAllowLogin();
         this.loadClientsFromServer();
     },
 
     render: function () {
-        return (
-            <div>
-                <h1>Update Client</h1>
-                <Clientform2 onClientSubmit={this.loadClientsFromServer} />
-                <br />
-                <div id = "theresults">
-                    <div id = "theleft">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Email</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Phone</th>
-                                <th></th>
-                            </tr>
-                         </thead>
-                        <ClientList data={this.state.data} />
-                    </table>
-                    </div>
-                    <div id="theright">
-                        <ClientUpdateform onUpdateSubmit={this.updateSingleClientFromServer} />
-                    </div>                
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
                 </div>
-            </div>
-        );
+            );
+        } else {
+            return (
+                <div>
+                    <h1>Update Client</h1>
+                    <Clientform2 onClientSubmit={this.loadClientsFromServer} />
+                    <br />
+                    <div id = "theresults">
+                        <div id = "theleft">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Email</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Phone</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <ClientList data={this.state.data} />
+                        </table>
+                        </div>
+                        <div id="theright">
+                            <ClientUpdateform onUpdateSubmit={this.updateSingleClientFromServer} />
+                        </div>                
+                    </div>
+                </div>
+            );
+        }
     }
 });
 
 var Clientform2 = React.createClass({
     getInitialState: function () {
         return {
-            clientid: "",
-            clientemail: "",
-            clientfname: "",
-            clientlname: "",
-            clientphone: "",
+            kd_clientid: "",
+            kd_clientemail: "",
+            kd_clientfname: "",
+            kd_clientlname: "",
+            kd_clientphone: "",
         };
     },
 
     handleSubmit: function (e) {
         e.preventDefault();
 
-        var clientid = this.state.clientid.trim();
-        var clientemail = this.state.clientemail.trim();
-        var clientfname = this.state.clientfname.trim();
-        var clientlname = this.state.clientlname.trim();
-        var clientphone = this.state.clientphone.trim();
+        var kd_clientid = this.state.kd_clientid.trim();
+        var kd_clientemail = this.state.kd_clientemail.trim();
+        var kd_clientfname = this.state.kd_clientfname.trim();
+        var kd_clientlname = this.state.kd_clientlname.trim();
+        var kd_clientphone = this.state.kd_clientphone.trim();
 
         this.props.onClientSubmit({ 
-            clientid: clientid, 
-            clientemail: clientemail, 
-            clientfname: clientfname, 
-            clientlname: clientlname, 
-            clientphone: clientphone,
+            kd_clientid: kd_clientid, 
+            kd_clientemail: kd_clientemail, 
+            kd_clientfname: kd_clientfname, 
+            kd_clientlname: kd_clientlname, 
+            kd_clientphone: kd_clientphone,
         });
     },
 
@@ -121,9 +149,9 @@ var Clientform2 = React.createClass({
                             <td>
                                 <input 
                                 type="text" 
-                                name="clientid" 
-                                id="clientid" 
-                                value={this.state.clientid} 
+                                name="kd_clientid" 
+                                id="kd_clientid" 
+                                value={this.state.kd_clientid} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -133,9 +161,9 @@ var Clientform2 = React.createClass({
                             <td>
                                 <input 
                                 type="text" 
-                                name="clientemail" 
-                                id="clientemail" 
-                                value={this.state.clientemail} 
+                                name="kd_clientemail" 
+                                id="kd_clientemail" 
+                                value={this.state.kd_clientemail} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -144,9 +172,9 @@ var Clientform2 = React.createClass({
                             <th>First Name</th>
                             <td>
                                 <input 
-                                name="clientfname" 
-                                id="clientfname" 
-                                value={this.state.clientfname} 
+                                name="kd_clientfname" 
+                                id="kd_clientfname" 
+                                value={this.state.kd_clientfname} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -155,9 +183,9 @@ var Clientform2 = React.createClass({
                             <th>Last Name</th>
                             <td>
                                 <input 
-                                name="clientlname" 
-                                id="clientlname" 
-                                value={this.state.clientlname} 
+                                name="kd_clientlname" 
+                                id="kd_clientlname" 
+                                value={this.state.kd_clientlname} 
                                 onChange={this.handleChange}  
                                 />
                             </td>
@@ -166,9 +194,9 @@ var Clientform2 = React.createClass({
                             <th>Phone</th>
                             <td>
                                 <input 
-                                name="clientphone" 
-                                id="clientphone" 
-                                value={this.state.clientphone} 
+                                name="kd_clientphone" 
+                                id="kd_clientphone" 
+                                value={this.state.kd_clientphone} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -185,29 +213,29 @@ var Clientform2 = React.createClass({
 var ClientUpdateform = React.createClass({
     getInitialState: function () {
         return {
-            upclient: "",
-            upclientemail: "",
-            upclientfname: "",
-            upclientlname: "",
-            upclientphone: "",
+            kd_upclient: "",
+            kd_upclientemail: "",
+            kd_upclientfname: "",
+            kd_upclientlname: "",
+            kd_upclientphone: "",
         };
     },
     
     handleUpSubmit: function (e) {
         e.preventDefault();
 
-        var upclientid = upcliid.value;
-        var upclientemail = upcliemail.value;
-        var upclientfname = upclifname.value;
-        var upclientlname = upclilname.value;
-        var upclientphone = upcliphone.value;
+        var kd_upclientid = kd_upcliid.value;
+        var kd_upclientemail = kd_upcliemail.value;
+        var kd_upclientfname = kd_upclifname.value;
+        var kd_upclientlname = kd_upclilname.value;
+        var kd_upclientphone = kd_upcliphone.value;
 
         this.props.onUpdateSubmit({ 
-            upclientid: upclientid, 
-            upclientemail: upclientemail, 
-            upclientfname: upclientfname, 
-            upclientlname: upclientlname, 
-            upclientphone: upclientphone,
+            kd_upclientid: kd_upclientid, 
+            kd_upclientemail: kd_upclientemail, 
+            kd_upclientfname: kd_upclientfname, 
+            kd_upclientlname: kd_upclientlname, 
+            kd_upclientphone: kd_upclientphone,
         });
     },
 
@@ -222,9 +250,9 @@ var ClientUpdateform = React.createClass({
                             <th>Email</th>
                             <td>
                                 <input 
-                                name="upcliemail" 
-                                id="upcliemail" 
-                                value={this.state.upcliemail} 
+                                name="kd_upcliemail" 
+                                id="kd_upcliemail" 
+                                value={this.state.kd_upcliemail} 
                                 onChange={this.handleUpChange} 
                                 />
                             </td>
@@ -233,9 +261,9 @@ var ClientUpdateform = React.createClass({
                             <th>First Name</th>
                             <td>
                                 <input 
-                                name="upclifname" 
-                                id="upclifname" 
-                                value={this.state.upclifname} 
+                                name="kd_upclifname" 
+                                id="kd_upclifname" 
+                                value={this.state.kd_upclifname} 
                                 onChange={this.handleUpChange}  
                                 />
                             </td>
@@ -244,9 +272,9 @@ var ClientUpdateform = React.createClass({
                             <th>Last Name</th>
                             <td>
                                 <input 
-                                name="upclilname" 
-                                id="upclilname" 
-                                value={this.state.upclilname} 
+                                name="kd_upclilname" 
+                                id="kd_upclilname" 
+                                value={this.state.kd_upclilname} 
                                 onChange={this.handleUpChange} 
                                 />
                             </td>
@@ -255,16 +283,16 @@ var ClientUpdateform = React.createClass({
                             <th>Phone</th>
                             <td>
                                 <input 
-                                name="upcliphone" 
-                                id="upcliphone" 
-                                value={this.state.upcliphone} 
+                                name="kd_upcliphone" 
+                                id="kd_upcliphone" 
+                                value={this.state.kd_upcliphone} 
                                 onChange={this.handleUpChange} 
                                 />
                             </td>
                         </tr> 
                     </tbody>
                 </table><br />
-                        <input type="hidden" name="upcliid" id="upcliid" onChange={this.handleUpChange} />
+                        <input type="hidden" name="kd_upcliid" id="kd_upcliid" onChange={this.handleUpChange} />
                         <input type="submit" value="Update Client" />
                     </form>
                 </div>
@@ -302,8 +330,8 @@ var ClientList = React.createClass({
 var Client = React.createClass({
     getInitialState: function () {
         return {
-            upcliid: "",
-            singledata: []
+            kd_upcliid: "",
+            kd_singledata: []
         };
     },
     updateRecord: function (e) {
@@ -316,19 +344,19 @@ var Client = React.createClass({
         $.ajax({
             url: '/getsingleclient/',
             data: {
-                'upcliid': theupcliid
+                'kd_upcliid': theupcliid
             },
             dataType: 'json',
             cache: false,
             success: function (data) {
-                this.setState({ singledata: data });
-                console.log(this.state.singledata);
-                var populateClient = this.state.singledata.map(function (client) {
-                    upcliid.value = theupcliid;
-                    upcliemail.value = client.clientEmail;
-                    upclifname.value = client.clientFirstName;
-                    upclilname.value = client.clientLastName;
-                    upcliphone.value = client.clientPhone;
+                this.setState({ kd_singledata: data });
+                console.log(this.state.kd_singledata);
+                var populateClient = this.state.kd_singledata.map(function (client) {
+                    kd_upcliid.value = theupcliid;
+                    kd_upcliemail.value = client.clientEmail;
+                    kd_upclifname.value = client.clientFirstName;
+                    kd_upclilname.value = client.clientLastName;
+                    kd_upcliphone.value = client.clientPhone;
 
                 });
             }.bind(this),

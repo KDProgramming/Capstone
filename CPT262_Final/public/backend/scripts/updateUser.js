@@ -1,15 +1,33 @@
+var ususer = 0;
 var UserBox = React.createClass({
     getInitialState: function () {
-        return { data: [] };
+        return { data: [], viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                if (data !== 0) {
+                    this.loadUserFromServer();
+                }
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
     },
     loadUserFromServer: function () {
 
         $.ajax({
             url: '/getuser/',
             data: {
-                'userid': userid.value,
-                'usercategory': uscategory.value,
-                'useremail': useremail.value,
+                'kd_userid': kd_userid.value,
+                'kd_usercategory': uscategory.value,
+                'kd_useremail': kd_useremail.value,
             },
             
             dataType: 'json',
@@ -40,44 +58,54 @@ var UserBox = React.createClass({
         window.location.reload(true);
     },
     componentDidMount: function () {
+        this.loadAllowLogin();
         this.loadUserFromServer();
     },
 
     render: function () {
-        return (
-            <div>
-                <h1>Update Users</h1>
-                <Userform2 onUserSubmit={this.loadUserFromServer} />
-                <br />
-                <div id = "theresults">
-                    <div id = "theleft">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Category</th>
-                                <th>Email</th>
-                                <th></th>
-                            </tr>
-                         </thead>
-                         <UserList data={this.state.data} />
-                    </table>
-                    </div>
-                    <div id="theright">
-                        <UserUpdateform onUpdateSubmit={this.updateSingleUserFromServer} />
-                    </div>                
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
                 </div>
-            </div>
-        );
+            );
+        } else { 
+            return (
+                <div>
+                    <h1>Update Users</h1>
+                    <Userform2 onUserSubmit={this.loadUserFromServer} />
+                    <br />
+                    <div id = "theresults">
+                        <div id = "theleft">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Category</th>
+                                    <th>Email</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <UserList data={this.state.data} />
+                        </table>
+                        </div>
+                        <div id="theright">
+                            <UserUpdateform onUpdateSubmit={this.updateSingleUserFromServer} />
+                        </div>                
+                    </div>
+                </div>
+            );
+        }
     }
 });
 
 var Userform2 = React.createClass({
     getInitialState: function () {
         return {
-            userid: "",
-            categorydata: [],
-            useremail: "",
+            kd_userid: "",
+            kd_categorydata: [],
+            kd_useremail: "",
         };
     },
 
@@ -87,7 +115,7 @@ var Userform2 = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({categorydata:data});
+                this.setState({kd_categorydata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -101,14 +129,14 @@ var Userform2 = React.createClass({
     handleSubmit: function (e) {
         e.preventDefault();
 
-        var userid = this.state.userid.trim();
-        var usercategory = uscategory.value;
-        var useremail = this.state.useremail.trim();
+        var kd_userid = this.state.kd_userid.trim();
+        var kd_usercategory = uscategory.value;
+        var kd_useremail = this.state.kd_useremail.trim();
 
         this.props.onUserSubmit({ 
-            userid: userid, 
-            usercategory: usercategory,
-            useremail: useremail, 
+            kd_userid: kd_userid, 
+            kd_usercategory: kd_usercategory,
+            kd_useremail: kd_useremail, 
         });
 
     },
@@ -130,9 +158,9 @@ var Userform2 = React.createClass({
                             <td>
                                 <input 
                                 type="text"
-                                name="userid" 
-                                id="userid" 
-                                value={this.state.userid} 
+                                name="kd_userid" 
+                                id="kd_userid" 
+                                value={this.state.kd_userid} 
                                 onChange={this.handleChange}  
                                 />
                             </td>
@@ -140,16 +168,16 @@ var Userform2 = React.createClass({
                         <tr>
                             <th>User Category</th>
                             <td>
-                                <CategoryList data={this.state.categorydata} />
+                                <CategoryList data={this.state.kd_categorydata} />
                             </td>
                         </tr>
                         <tr>
                             <th>User Email</th>
                             <td>
                                 <input 
-                                name="useremail" 
-                                id="useremail" 
-                                value={this.state.useremail} 
+                                name="kd_useremail" 
+                                id="kd_useremail" 
+                                value={this.state.kd_useremail} 
                                 onChange={this.handleChange}  
                                 />
                             </td>
@@ -167,9 +195,9 @@ var Userform2 = React.createClass({
 var UserUpdateform = React.createClass({
     getInitialState: function () {
         return {
-            upuserid: "",
-            upcategorydata: [],
-            upuseremail: "",
+            kd_upuserid: "",
+            kd_upcategorydata: [],
+            kd_upuseremail: "",
         };
     },
 
@@ -179,7 +207,7 @@ var UserUpdateform = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({ upcategorydata:data });
+                this.setState({ kd_upcategorydata:data });
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -193,14 +221,14 @@ var UserUpdateform = React.createClass({
     handleUpSubmit: function (e) {
         e.preventDefault();
 
-        var upuserid = upusid.value;
-        var upusercategory = upuscategory.value;
-        var upuseremail = upusemail.value;
+        var kd_upuserid = kd_upusid.value;
+        var kd_upusercategory = upuscategory.value;
+        var kd_upuseremail = kd_upusemail.value;
 
         this.props.onUpdateSubmit({ 
-            upuserid: upuserid, 
-            upusercategory: upusercategory, 
-            upuseremail: upuseremail, 
+            kd_upuserid: kd_upuserid, 
+            kd_upusercategory: kd_upusercategory, 
+            kd_upuseremail: kd_upuseremail, 
         });
     },
 
@@ -221,23 +249,23 @@ var UserUpdateform = React.createClass({
                         <tr>
                             <th>Category</th>
                             <td>
-                                <CategoryUpdateList data={this.state.upcategorydata} />
+                                <CategoryUpdateList data={this.state.kd_upcategorydata} />
                             </td>
                         </tr>
                         <tr>
                             <th>Email</th>
                             <td>
                                 <input 
-                                name="upusemail" 
-                                id="upusemail" 
-                                value={this.state.upusemail} 
+                                name="kd_upusemail" 
+                                id="kd_upusemail" 
+                                value={this.state.kd_upusemail} 
                                 onChange={this.handleUpChange} 
                                 />
                             </td>
                         </tr>
                     </tbody>
                 </table><br/>
-                <input type="hidden" name="upusid" id="upusid" onChange={this.handleUpChange} />
+                <input type="hidden" name="kd_upusid" id="kd_upusid" onChange={this.handleUpChange} />
                 <input type="submit" value="Update User" />
             </form>
             </div>
@@ -272,8 +300,8 @@ var UserList = React.createClass({
 var User = React.createClass({
     getInitialState: function () {
         return {
-            upusid: "",
-            singledata: []
+            kd_upusid: "",
+            kd_singledata: []
         };
     },
     updateRecord: function (e) {
@@ -286,17 +314,17 @@ var User = React.createClass({
         $.ajax({
             url: '/getsingleuser/',
             data: {
-                'upusid': theupusid
+                'kd_upusid': theupusid
             },
             dataType: 'json',
             cache: false,
             success: function (data) {
-                this.setState({ singledata: data });
-                console.log(this.state.singledata);
-                var populateUser = this.state.singledata.map(function (user) {
-                    upusid.value = theupusid;
+                this.setState({ kd_singledata: data });
+                console.log(this.state.kd_singledata);
+                var populateUser = this.state.kd_singledata.map(function (user) {
+                    kd_upusid.value = theupusid;
                     upuscategory.value = user.userCategoryID;
-                    upusemail.value = user.userEmail;
+                    kd_upusemail.value = user.userEmail;
                     
 
                 });

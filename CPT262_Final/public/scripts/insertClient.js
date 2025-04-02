@@ -26,46 +26,46 @@ var ClientBox = React.createClass({
 var Clientform2 = React.createClass({
     getInitialState: function () {
         return {
-            clientemail: "",
-            clientfname: "",
-            clientlname: "",
-            clientphone: "",
-            clientpw: "",
-            clientpw2: "",
+            kd_clientemail: "",
+            kd_clientfname: "",
+            kd_clientlname: "",
+            kd_clientphone: "",
+            kd_clientpw: "",
+            kd_clientpw2: "",
         };
     },
 
     handleSubmit: function (e) { 
         e.preventDefault(); 
         
-        var clientemail = this.state.clientemail.trim();
-        var clientfname = this.state.clientfname.trim();
-        var clientlname = this.state.clientlname.trim();
-        var clientphone = this.state.clientphone.trim();
-        var clientpw = this.state.clientpw.trim();
-        var clientpw2 = this.state.clientpw2.trim();
-        console.log(clientpw);
+        var kd_clientemail = this.state.kd_clientemail.trim();
+        var kd_clientfname = this.state.kd_clientfname.trim();
+        var kd_clientlname = this.state.kd_clientlname.trim();
+        var kd_clientphone = this.state.kd_clientphone.trim();
+        var kd_clientpw = this.state.kd_clientpw.trim();
+        var kd_clientpw2 = this.state.kd_clientpw2.trim();
+        console.log(kd_clientpw);
 
-        if (!clientlname || !clientphone) {
+        if (!kd_clientlname || !kd_clientphone) {
             alert("Field Missing");
             return;
         }
-        if (!this.validateEmail(clientemail)) {
-            alert("Email Invalid" + this.validateEmail(clientemail));
+        if (!this.validateEmail(kd_clientemail)) {
+            alert("Email Invalid" + this.validateEmail(kd_clientemail));
             return;
         }
-        if (clientpw != clientpw2) {
+        if (kd_clientpw != kd_clientpw2) {
             alert("Passwords Do Not Match!");
             return;
         }
 
         this.props.onClientSubmit({
-            clientemail: clientemail,
-            clientfname: clientfname,
-            clientlname: clientlname,
-            clientphone: clientphone,
-            clientpw: clientpw,
-            clientpw2: clientpw2,
+            kd_clientemail: kd_clientemail,
+            kd_clientfname: kd_clientfname,
+            kd_clientlname: kd_clientlname,
+            kd_clientphone: kd_clientphone,
+            kd_clientpw: kd_clientpw,
+            kd_clientpw2: kd_clientpw2,
         });
     },
 
@@ -92,12 +92,12 @@ var Clientform2 = React.createClass({
                             <th>Email</th>
                             <td>
                                 <TextInput
-                                    value={this.state.clientemail}
-                                    uniqueName="clientemail"
+                                    value={this.state.kd_clientemail}
+                                    uniqueName="kd_clientemail"
                                     textArea={false}
                                     required={true}
                                     validate={this.validateEmail}
-                                    onChange={this.setValue.bind(this, 'clientemail')}
+                                    onChange={this.setValue.bind(this, 'kd_clientemail')}
                                     errorMessage="Invalid EMail Address"
                                     emptyMessage="EMail Address is Required" />
                             </td>
@@ -106,13 +106,13 @@ var Clientform2 = React.createClass({
                             <th>First Name</th>
                             <td>
                                 <TextInput
-                                    value={this.state.clientfname}
-                                    uniqueName="clientfname"
+                                    value={this.state.kd_clientfname}
+                                    uniqueName="kd_clientfname"
                                     textArea={false}
                                     required={false}
                                     minCharacters={2}
                                     validate={this.commonValidate}
-                                    onChange={this.setValue.bind(this, 'clientfname')}
+                                    onChange={this.setValue.bind(this, 'kd_clientfname')}
                                     errorMessage="First Name is invalid" />
                             </td>
                         </tr>
@@ -120,12 +120,12 @@ var Clientform2 = React.createClass({
                             <th>Last Name</th>
                             <td>
                                 <TextInput
-                                    value={this.state.clientlname}
-                                    uniqueName="clientlname"
+                                    value={this.state.kd_clientlname}
+                                    uniqueName="kd_clientlname"
                                     textArea={false}
                                     required={true}
                                     validate={this.commonValidate}
-                                    onChange={this.setValue.bind(this, 'clientlname')}
+                                    onChange={this.setValue.bind(this, 'kd_clientlname')}
                                     errorMessage="Last Name is invalid"
                                     emptyMessage="Last Name is required" />
                             </td>
@@ -134,13 +134,13 @@ var Clientform2 = React.createClass({
                             <th>Phone</th>
                             <td>
                                 <TextInput
-                                    value={this.state.clientphone}
-                                    uniqueName="clientphone"
+                                    value={this.state.kd_clientphone}
+                                    uniqueName="kd_clientphone"
                                     textArea={false}
                                     required={false}
                                     minCharacters={6}
                                     validate={this.commonValidate}
-                                    onChange={this.setValue.bind(this, 'clientphone')}
+                                    onChange={this.setValue.bind(this, 'kd_clientphone')}
                                     errorMessage="Phone Number is invalid" />
                             </td>
                         </tr>
@@ -149,12 +149,12 @@ var Clientform2 = React.createClass({
                             <td>
                                 <TextInput
                                     inputType="password"
-                                    value={this.state.clientpw}
-                                    uniqueName="clientpw"
+                                    value={this.state.kd_clientpw}
+                                    uniqueName="kd_clientpw"
                                     textArea={false}
                                     required={true}
                                     validate={this.commonValidate}
-                                    onChange={this.setValue.bind(this, 'clientpw')}
+                                    onChange={this.setValue.bind(this, 'kd_clientpw')}
                                     errorMessage="Password is Invalid" 
                                     emptyMessage="Password is Required" />
                             </td>
@@ -164,12 +164,12 @@ var Clientform2 = React.createClass({
                             <td>
                                 <TextInput
                                     inputType="password"
-                                    value={this.state.clientpw2}
-                                    uniqueName="clientpw2"
+                                    value={this.state.kd_clientpw2}
+                                    uniqueName="kd_clientpw2"
                                     textArea={false}
                                     required={true}
                                     validate={this.commonValidate}
-                                    onChange={this.setValue.bind(this, 'clientpw2')}
+                                    onChange={this.setValue.bind(this, 'kd_clientpw2')}
                                     errorMessage="Password is Invalid" 
                                     emptyMessage="Password Verification is Required" />
                             </td>

@@ -1,15 +1,33 @@
+var ususer = 0;
 var ProductBox = React.createClass({
     getInitialState: function () {
-        return { data: [] };
+        return { data: [], viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                if (data !== 0) {
+                    this.loadProductFromServer();
+                }
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
     },
     loadProductFromServer: function () {
         $.ajax({
             url: '/getproduct/',
             data: {
-                'productid': productid.value,
-                'productname': productname.value,
-                'productquantity': productquantity.value,
-                'productprice': productprice.value,
+                'kd_productid': kd_productid.value,
+                'kd_productname': kd_productname.value,
+                'kd_productquantity': kd_productquantity.value,
+                'kd_productprice': kd_productprice.value,
             },
             
             dataType: 'json',
@@ -42,62 +60,72 @@ var ProductBox = React.createClass({
         window.location.reload(true);
     },
     componentDidMount: function () {
+        this.loadAllowLogin();
         this.loadProductFromServer();
     },
 
     render: function () {
-        return (
-            <div>
-                <h1>Update Product</h1>
-                <Productform2 onProductSubmit={this.loadProductFromServer} />
-                <br />
-                <div id = "theresults">
-                    <div id = "theleft">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                                <th></th>
-                            </tr>
-                         </thead>
-                         <ProductList data={this.state.data} />
-                    </table>
-                    </div>
-                    <div id="theright">
-                        <ProductUpdateform onUpdateSubmit={this.updateSingleProductFromServer} />
-                    </div>                
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
                 </div>
-            </div>
-        );
+            );
+        } else { 
+            return (
+                <div>
+                    <h1>Update Product</h1>
+                    <Productform2 onProductSubmit={this.loadProductFromServer} />
+                    <br />
+                    <div id = "theresults">
+                        <div id = "theleft">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <ProductList data={this.state.data} />
+                        </table>
+                        </div>
+                        <div id="theright">
+                            <ProductUpdateform onUpdateSubmit={this.updateSingleProductFromServer} />
+                        </div>                
+                    </div>
+                </div>
+            );
+        }
     }
 });
 
 var Productform2 = React.createClass({
     getInitialState: function () {
         return {
-            productid: "",
-            productname: "",
-            productquantity: "",
-            productprice: "",
+            kd_productid: "",
+            kd_productname: "",
+            kd_productquantity: "",
+            kd_productprice: "",
         };
     },
 
     handleSubmit: function (e) {
         e.preventDefault();
 
-        var productid = this.state.productid.trim();
-        var productname = this.state.productname.trim();
-        var productquantity = this.state.productquantity.trim();
-        var productprice = this.state.productprice.trim();
+        var kd_productid = this.state.kd_productid.trim();
+        var kd_productname = this.state.kd_productname.trim();
+        var kd_productquantity = this.state.kd_productquantity.trim();
+        var kd_productprice = this.state.kd_productprice.trim();
 
         this.props.onProductSubmit({ 
-            productid: productid, 
-            productname: productname, 
-            productquantity: productquantity, 
-            productprice: productprice,
+            kd_productid: kd_productid, 
+            kd_productname: kd_productname, 
+            kd_productquantity: kd_productquantity, 
+            kd_productprice: kd_productprice,
         });
 
     },
@@ -118,9 +146,9 @@ var Productform2 = React.createClass({
                             <th>Product ID</th>
                             <td>
                                 <input 
-                                name="productid" 
-                                id="productid" 
-                                value={this.state.productid} 
+                                name="kd_productid" 
+                                id="kd_productid" 
+                                value={this.state.kd_productid} 
                                 onChange={this.handleChange}  
                                 />
                             </td>
@@ -129,9 +157,9 @@ var Productform2 = React.createClass({
                             <th>Product Name</th>
                             <td>
                                 <input 
-                                name="productname" 
-                                id="productname" 
-                                value={this.state.productname} 
+                                name="kd_productname" 
+                                id="kd_productname" 
+                                value={this.state.kd_productname} 
                                 onChange={this.handleChange}  
                                 />
                             </td>
@@ -140,9 +168,9 @@ var Productform2 = React.createClass({
                             <th>Product Quantity</th>
                             <td>
                                 <input 
-                                name="productquantity" 
-                                id="productquantity" 
-                                value={this.state.productquantity} 
+                                name="kd_productquantity" 
+                                id="kd_productquantity" 
+                                value={this.state.kd_productquantity} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -151,9 +179,9 @@ var Productform2 = React.createClass({
                             <th>Product Price</th>
                             <td>
                                 <input 
-                                name="productprice" 
-                                id="productprice" 
-                                value={this.state.productprice}
+                                name="kd_productprice" 
+                                id="kd_productprice" 
+                                value={this.state.kd_productprice}
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -170,26 +198,26 @@ var Productform2 = React.createClass({
 var ProductUpdateform = React.createClass({
     getInitialState: function () {
         return {
-            upproductid: "",
-            upproductname: "",
-            upproductprice: "",
-            upproductquantity: "",
+            kd_upproductid: "",
+            kd_upproductname: "",
+            kd_upproductprice: "",
+            kd_upproductquantity: "",
         };
     },
 
     handleUpSubmit: function (e) {
         e.preventDefault();
 
-        var upproductid = upprodid.value;
-        var upproductname = upprodname.value;
-        var upproductprice = upprodprice.value;
-        var upproductquantity = upprodquantity.value;
+        var kd_upproductid = kd_upprodid.value;
+        var kd_upproductname = kd_upprodname.value;
+        var kd_upproductprice = kd_upprodprice.value;
+        var kd_upproductquantity = kd_upprodquantity.value;
 
         this.props.onUpdateSubmit({ 
-            upproductid: upproductid, 
-            upproductname: upproductname, 
-            upproductprice: upproductprice,
-            upproductquantity: upproductquantity, 
+            kd_upproductid: kd_upproductid, 
+            kd_upproductname: kd_upproductname, 
+            kd_upproductprice: kd_upproductprice,
+            kd_upproductquantity: kd_upproductquantity, 
         });
     },
     
@@ -204,9 +232,9 @@ var ProductUpdateform = React.createClass({
                             <th>Product Name</th>
                             <td>
                                 <input 
-                                name="upprodname" 
-                                id="upprodname" 
-                                value={this.state.upprodname} 
+                                name="kd_upprodname" 
+                                id="kd_upprodname" 
+                                value={this.state.kd_upprodname} 
                                 onChange={this.handleUpChange}  
                                 />
                             </td>
@@ -215,9 +243,9 @@ var ProductUpdateform = React.createClass({
                             <th>Product Price</th>
                             <td>
                                 <input 
-                                name="upprodprice" 
-                                id="upprodprice" 
-                                value={this.state.upprodprice}
+                                name="kd_upprodprice" 
+                                id="kd_upprodprice" 
+                                value={this.state.kd_upprodprice}
                                 onChange={this.handleUpChange} 
                                 />
                             </td>
@@ -226,16 +254,16 @@ var ProductUpdateform = React.createClass({
                             <th>Product Quantity</th>
                             <td>
                                 <input 
-                                name="upprodquantity" 
-                                id="upprodquantity" 
-                                value={this.state.upprodquantity} 
+                                name="kd_upprodquantity" 
+                                id="kd_upprodquantity" 
+                                value={this.state.kd_upprodquantity} 
                                 onChange={this.handleUpChange} 
                                 />
                             </td>
                         </tr>
                     </tbody>
                 </table><br/>
-                <input type="hidden" name="upprodid" id="upprodid" onChange={this.handleUpChange} />
+                <input type="hidden" name="kd_upprodid" id="kd_upprodid" onChange={this.handleUpChange} />
                 <input type="submit" value="Update Product" />
             </form>
             </div>
@@ -271,8 +299,8 @@ var ProductList = React.createClass({
 var Product = React.createClass({
     getInitialState: function () {
         return {
-            upprodid: "",
-            singledata: []
+            kd_upprodid: "",
+            kd_singledata: []
         };
     },
     updateRecord: function (e) {
@@ -285,18 +313,18 @@ var Product = React.createClass({
         $.ajax({
             url: '/getsingleproduct/',
             data: {
-                'upprodid': theupprodid
+                'kd_upprodid': theupprodid
             },
             dataType: 'json',
             cache: false,
             success: function (data) {
-                this.setState({ singledata: data });
-                console.log(this.state.singledata);
-                var populateProd = this.state.singledata.map(function (product) {
-                    upprodid.value = theupprodid;
-                    upprodname.value = product.productName;
-                    upprodprice.value = product.productPrice; 
-                    upprodquantity.value = product.productQuantity;
+                this.setState({ kd_singledata: data });
+                console.log(this.state.kd_singledata);
+                var populateProd = this.state.kd_singledata.map(function (product) {
+                    kd_upprodid.value = theupprodid;
+                    kd_upprodname.value = product.productName;
+                    kd_upprodprice.value = product.productPrice; 
+                    kd_upprodquantity.value = product.productQuantity;
                     
                 });
             }.bind(this),

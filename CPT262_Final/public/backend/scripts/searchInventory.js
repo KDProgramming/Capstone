@@ -1,15 +1,33 @@
+var ususer = 0;
 var InventoryBox = React.createClass({
     getInitialState: function () {
-        return { data: [] };
+        return { data: [], viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                if (data !== 0) {
+                    this.loadInventoryFromServer();
+                }
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
     },
     loadInventoryFromServer: function () {
         $.ajax({
             url: '/getinventory/',
             data: {
-                'inventoryid': inventoryid.value,
-                'inventorylevel': inventorylevel.value,
-                'inventorylastupdated': inventorylastupdated.value,
-                'inventoryproduct': invproduct.value,         
+                'kd_inventoryid': kd_inventoryid.value,
+                'kd_inventorylevel': kd_inventorylevel.value,
+                'kd_inventorylastupdated': kd_inventorylastupdated.value,
+                'kd_inventoryproduct': invproduct.value,         
             },
             
             dataType: 'json',
@@ -24,39 +42,49 @@ var InventoryBox = React.createClass({
 
     },
     componentDidMount: function () {
+        this.loadAllowLogin();
         this.loadInventoryFromServer();
     },
 
     render: function () {
-        return (
-            <div>
-                <h1>Inventory</h1>
-                <Inventoryform2 onInventorySubmit={this.loadInventoryFromServer} />
-                <br />
-                <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Level</th>
-                                <th>Last Updated</th>
-                                <th>Product</th>
-                            </tr>
-                         </thead>
-                        <InventoryList data={this.state.data} />
-                    </table>
-                
-            </div>
-        );
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
+                </div>
+            );
+        } else { 
+            return (
+                <div>
+                    <h1>Inventory</h1>
+                    <Inventoryform2 onInventorySubmit={this.loadInventoryFromServer} />
+                    <br />
+                    <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Level</th>
+                                    <th>Last Updated</th>
+                                    <th>Product</th>
+                                </tr>
+                            </thead>
+                            <InventoryList data={this.state.data} />
+                        </table>
+                    
+                </div>
+            );
+        }
     }
 });
 
 var Inventoryform2 = React.createClass({
     getInitialState: function () {
         return {
-            inventoryid: "",
-            inventorylevel: "",
-            inventorylastupdated: "",
-            productdata: [],
+            kd_inventoryid: "",
+            kd_inventorylevel: "",
+            kd_inventorylastupdated: "",
+            kd_productdata: [],
         };
     },
 
@@ -66,7 +94,7 @@ var Inventoryform2 = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({productdata:data});
+                this.setState({kd_productdata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -80,16 +108,16 @@ var Inventoryform2 = React.createClass({
     handleSubmit: function (e) {
         e.preventDefault();
 
-        var inventoryid = this.state.inventoryid.trim();
-        var inventorylevel = this.state.inventorylevel.trim();
-        var inventorylastupdated = this.state.inventorylastupdated.trim();
-        var inventoryproduct = invproduct.value;
+        var kd_inventoryid = this.state.kd_inventoryid.trim();
+        var kd_inventorylevel = this.state.kd_inventorylevel.trim();
+        var kd_inventorylastupdated = this.state.kd_inventorylastupdated.trim();
+        var kd_inventoryproduct = invproduct.value;
 
         this.props.onInventorySubmit({ 
-            inventoryid: inventoryid, 
-            inventorylevel: inventorylevel, 
-            inventorylastupdated: inventorylastupdated, 
-            inventoryproduct: inventoryproduct,
+            kd_inventoryid: kd_inventoryid, 
+            kd_inventorylevel: kd_inventorylevel, 
+            kd_inventorylastupdated: kd_inventorylastupdated, 
+            kd_inventoryproduct: kd_inventoryproduct,
         });
     },
 
@@ -111,9 +139,9 @@ var Inventoryform2 = React.createClass({
                             <td>
                                 <input 
                                 type="text" 
-                                name="inventoryid" 
-                                id="inventoryid" 
-                                value={this.state.inventoryid} 
+                                name="kd_inventoryid" 
+                                id="kd_inventoryid" 
+                                value={this.state.kd_inventoryid} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -122,9 +150,9 @@ var Inventoryform2 = React.createClass({
                             <th>Inventory Level</th>
                             <td>
                                 <input 
-                                name="inventorylevel" 
-                                id="inventorylevel" 
-                                value={this.state.inventorylevel} 
+                                name="kd_inventorylevel" 
+                                id="kd_inventorylevel" 
+                                value={this.state.kd_inventorylevel} 
                                 onChange={this.handleChange}  
                                 />
                             </td>
@@ -134,9 +162,9 @@ var Inventoryform2 = React.createClass({
                             <td>
                                 <input 
                                 type = "datetime-local" 
-                                name="inventorylastupdated" 
-                                id="inventorylastupdated" 
-                                value={this.state.inventorylastupdated} 
+                                name="kd_inventorylastupdated" 
+                                id="kd_inventorylastupdated" 
+                                value={this.state.kd_inventorylastupdated} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -144,7 +172,7 @@ var Inventoryform2 = React.createClass({
                         <tr>
                             <th>Inventory Product</th>
                             <td>
-                                <ProductList data={this.state.productdata} /> 
+                                <ProductList data={this.state.kd_productdata} /> 
                             </td>
                         </tr>
                     </tbody>

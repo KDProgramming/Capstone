@@ -1,5 +1,25 @@
+var ususer = 0;
 var InventoryBox = React.createClass({
-
+    getInitialState: function() {
+        return { viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
+    },
+    componentDidMount: function () {
+        this.loadAllowLogin();
+    }, 
     handleInventorySubmit: function (inventory) {
         $.ajax({ 
             url: '/inventory/',
@@ -15,21 +35,30 @@ var InventoryBox = React.createClass({
         });
     },
     render: function () {
-        return (
-            <div className="InventoryBox">
-                <h1>Insert Inventory</h1>
-                <Inventoryform2 onInventorySubmit={this.handleInventorySubmit}/>
-            </div>
-        );
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
+                </div>
+            );
+        } else { 
+            return (
+                <div className="InventoryBox">
+                    <h1>Insert Inventory</h1>
+                    <Inventoryform2 onInventorySubmit={this.handleInventorySubmit}/>
+                </div>
+            );
+        }
     }
 });
 
 var Inventoryform2 = React.createClass({
     getInitialState: function () {
         return {
-            inventorylevel: "",
-            inventorylastupdated: "",
-            productdata: []
+            kd_inventorylevel: "",
+            kd_inventorylastupdated: "",
+            kd_productdata: []
         };
     },
     loadProducts: function() {
@@ -38,7 +67,7 @@ var Inventoryform2 = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({productdata:data});
+                this.setState({kd_productdata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -52,22 +81,22 @@ var Inventoryform2 = React.createClass({
     handleSubmit: function (e) {
         e.preventDefault(); 
 
-        var inventorylevel = this.state.inventorylevel.trim();
-        var inventorylastupdated = this.state.inventorylastupdated.trim();
-        var inventoryproduct = invproduct.value;
+        var kd_inventorylevel = this.state.kd_inventorylevel.trim();
+        var kd_inventorylastupdated = this.state.kd_inventorylastupdated.trim();
+        var kd_inventoryproduct = invproduct.value;
 
-        if (isNaN(inventorylevel)) {
+        if (isNaN(kd_inventorylevel)) {
             console.log("Inventory Level NaN");
             return;
         }
-        if (!inventorylevel || !inventorylastupdated) {
+        if (!kd_inventorylevel || !kd_inventorylastupdated) {
             console.log("Field Missing");
             return;
         }
         this.props.onInventorySubmit({ 
-            inventorylevel: inventorylevel,
-            inventorylastupdated: inventorylastupdated,
-            inventoryproduct: inventoryproduct
+            kd_inventorylevel: kd_inventorylevel,
+            kd_inventorylastupdated: kd_inventorylastupdated,
+            kd_inventoryproduct: kd_inventoryproduct
         });
     },
 
@@ -95,13 +124,13 @@ var Inventoryform2 = React.createClass({
                             <th>Level</th>
                             <td>
                                 <TextInput
-                                    value={this.state.inventorylevel}
-                                    uniqueName="inventorylevel"
+                                    value={this.state.kd_inventorylevel}
+                                    uniqueName="kd_inventorylevel"
                                     textArea={false}
                                     required={true}
                                     minCharacters={2}
                                     validate={this.commonValidate}
-                                    onChange={this.setValue.bind(this, 'inventorylevel')}
+                                    onChange={this.setValue.bind(this, 'kd_inventorylevel')}
                                     errorMessage="Inventory Level is invalid"
                                     emptyMessage="Inventory Level is required" />
                             </td>
@@ -111,9 +140,9 @@ var Inventoryform2 = React.createClass({
                             <td>
                             <input 
                                 type = "datetime-local" 
-                                name="inventorylastupdated" 
-                                id="inventorylastupdated" 
-                                value={this.state.inventorylastupdated} 
+                                name="kd_inventorylastupdated" 
+                                id="kd_inventorylastupdated" 
+                                value={this.state.kd_inventorylastupdated} 
                                 onChange={this.handleChange} />
                             </td>
                         </tr>
@@ -122,7 +151,7 @@ var Inventoryform2 = React.createClass({
                                 Inventory Product
                             </th>
                             <td>
-                                <ProductList data={this.state.productdata} />
+                                <ProductList data={this.state.kd_productdata} />
                             </td>
                         </tr>
                     </tbody>

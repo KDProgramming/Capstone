@@ -1,16 +1,34 @@
+var ususer = 0;
 var PurchasesBox = React.createClass({
     getInitialState: function () {
-        return { data: [] };
+        return { data: [], viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                if (data !== 0) {
+                    this.loadPurchasesFromServer();
+                }
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
     },
     loadPurchasesFromServer: function () {
         $.ajax({
             url: '/getpurchases/',
             data: {
-                'purchaseid': purchaseid.value,
-                'purchaseuser': puruser.value,
-                'purchasedate': purchasedate.value,
-                'purchasestatus': purstatus.value,
-                'purchasetotal': purchasetotal.value,         
+                'kd_purchaseid': kd_purchaseid.value,
+                'kd_purchaseuser': puruser.value,
+                'kd_purchasedate': kd_purchasedate.value,
+                'kd_purchasestatus': purstatus.value,
+                'kd_purchasetotal': kd_purchasetotal.value,         
             },
             
             dataType: 'json',
@@ -41,48 +59,58 @@ var PurchasesBox = React.createClass({
         window.location.reload(true);
     },
     componentDidMount: function () {
+        this.loadAllowLogin();
         this.loadPurchasesFromServer();
     },
 
     render: function () {
-        return (
-            <div>
-                <h1>Update Purchase</h1>
-                <Purchasesform2 onPurchaseSubmit={this.loadPurchasesFromServer} />
-                <br />
-                <div id = "theresults">
-                    <div id = "theleft">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>User Email</th>
-                                <th>Purchase Date</th>
-                                <th>Status</th>
-                                <th>Total</th>
-                                <th></th>
-                            </tr>
-                         </thead>
-                        <PurchasesList data={this.state.data} />
-                    </table>
-                    </div>
-                    <div id="theright">
-                        <PurchasesUpdateform onUpdateSubmit={this.updateSinglePurchaseFromServer} />
-                    </div>                
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
                 </div>
-            </div>
-        );
+            );
+        } else { 
+            return (
+                <div>
+                    <h1>Update Purchase</h1>
+                    <Purchasesform2 onPurchaseSubmit={this.loadPurchasesFromServer} />
+                    <br />
+                    <div id = "theresults">
+                        <div id = "theleft">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User Email</th>
+                                    <th>Purchase Date</th>
+                                    <th>Status</th>
+                                    <th>Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <PurchasesList data={this.state.data} />
+                        </table>
+                        </div>
+                        <div id="theright">
+                            <PurchasesUpdateform onUpdateSubmit={this.updateSinglePurchaseFromServer} />
+                        </div>                
+                    </div>
+                </div>
+            );
+        }
     }
 });
 
 var Purchasesform2 = React.createClass({
     getInitialState: function () {
         return {
-            purchaseid: "",
-            userdata: [],
-            purchasedate: "",
-            statusdata: [],
-            purchasetotal: "",
+            kd_purchaseid: "",
+            kd_userdata: [],
+            kd_purchasedate: "",
+            kd_statusdata: [],
+            kd_purchasetotal: "",
         };
     },
 
@@ -92,7 +120,7 @@ var Purchasesform2 = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({userdata:data});
+                this.setState({kd_userdata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -105,7 +133,7 @@ var Purchasesform2 = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({statusdata:data});
+                this.setState({kd_statusdata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -120,18 +148,18 @@ var Purchasesform2 = React.createClass({
     handleSubmit: function (e) {
         e.preventDefault();
 
-        var purchaseid = this.state.purchaseid.trim();
-        var purchaseuser = puruser.value;
-        var purchasedate = this.state.purchasedate;
-        var purchasestatus = purstatus.value;
-        var purchasetotal = this.state.purchasetotal.trim();
+        var kd_purchaseid = this.state.kd_purchaseid.trim();
+        var kd_purchaseuser = puruser.value;
+        var kd_purchasedate = this.state.kd_purchasedate;
+        var kd_purchasestatus = purstatus.value;
+        var kd_purchasetotal = this.state.kd_purchasetotal.trim();
 
         this.props.onPurchaseSubmit({ 
-            purchaseid: purchaseid, 
-            purchaseuser: purchaseuser, 
-            purchasedate: purchasedate, 
-            purchasestatus: purchasestatus, 
-            purchasetotal: purchasetotal,
+            kd_purchaseid: kd_purchaseid, 
+            kd_purchaseuser: kd_purchaseuser, 
+            kd_purchasedate: kd_purchasedate, 
+            kd_purchasestatus: kd_purchasestatus, 
+            kd_purchasetotal: kd_purchasetotal,
         });
     },
     handleChange: function (event) {
@@ -154,9 +182,9 @@ var Purchasesform2 = React.createClass({
                             <td>
                                 <input 
                                 type="text" 
-                                name="purchaseid" 
-                                id="purchaseid" 
-                                value={this.state.purchaseid} 
+                                name="kd_purchaseid" 
+                                id="kd_purchaseid" 
+                                value={this.state.kd_purchaseid} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -164,7 +192,7 @@ var Purchasesform2 = React.createClass({
                         <tr>
                             <th>User Email</th>
                             <td>
-                                <UserList data={this.state.userdata} />
+                                <UserList data={this.state.kd_userdata} />
                             </td>
                         </tr>
                         <tr>
@@ -172,25 +200,25 @@ var Purchasesform2 = React.createClass({
                             <td>
                             <input 
                                 type = "datetime-local" 
-                                name="purchasedate" 
-                                id="purchasedate" 
-                                value={this.state.purchasedate} 
+                                name="kd_purchasedate" 
+                                id="kd_purchasedate" 
+                                value={this.state.kd_purchasedate} 
                                 onChange={this.handleChange}  />
                             </td>
                         </tr>
                         <tr>
                             <th>Status</th>
                             <td>
-                                <StatusList data={this.state.statusdata} />
+                                <StatusList data={this.state.kd_statusdata} />
                             </td>
                         </tr>
                         <tr>
                             <th>Total</th>
                             <td>
                                 <input 
-                                name="purchasetotal" 
-                                id="purchasetotal" 
-                                value={this.state.purchasetotal} 
+                                name="kd_purchasetotal" 
+                                id="kd_purchasetotal" 
+                                value={this.state.kd_purchasetotal} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -214,11 +242,11 @@ var Purchasesform2 = React.createClass({
 var PurchasesUpdateform = React.createClass({
     getInitialState: function () {
         return {
-            uppurchaseid: "",
-            upuserdata: [],
-            uppurchasedate: "",
-            upstatusdata: [],
-            uppurchasetotal: "",
+            kd_uppurchaseid: "",
+            kd_upuserdata: [],
+            kd_uppurchasedate: "",
+            kd_upstatusdata: [],
+            kd_uppurchasetotal: "",
         };
     },
 
@@ -228,7 +256,7 @@ var PurchasesUpdateform = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({upuserdata:data});
+                this.setState({kd_upuserdata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -241,7 +269,7 @@ var PurchasesUpdateform = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({upstatusdata:data});
+                this.setState({kd_upstatusdata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -256,18 +284,18 @@ var PurchasesUpdateform = React.createClass({
     handleUpSubmit: function (e) {
         e.preventDefault();
 
-        var uppurchaseid = uppurid.value;
-        var uppurchaseuser = uppuruser.value;
-        var uppurchasedate = uppurdate.value;
-        var uppurchasestatus = uppurstatus.value;
-        var uppurchasetotal = uppurtotal.value;
+        var kd_uppurchaseid = kd_uppurid.value;
+        var kd_uppurchaseuser = uppuruser.value;
+        var kd_uppurchasedate = kd_uppurdate.value;
+        var kd_uppurchasestatus = uppurstatus.value;
+        var kd_uppurchasetotal = kd_uppurtotal.value;
 
         this.props.onUpdateSubmit({ 
-            uppurchaseid: uppurchaseid, 
-            uppurchaseuser: uppurchaseuser, 
-            uppurchasedate: uppurchasedate, 
-            uppurchasestatus: uppurchasestatus, 
-            uppurchasetotal: uppurchasetotal,
+            kd_uppurchaseid: kd_uppurchaseid, 
+            kd_uppurchaseuser: kd_uppurchaseuser, 
+            kd_uppurchasedate: kd_uppurchasedate, 
+            kd_uppurchasestatus: kd_uppurchasestatus, 
+            kd_uppurchasetotal: kd_uppurchasetotal,
         });
     },
     handleUpChange: function (event) {
@@ -286,7 +314,7 @@ var PurchasesUpdateform = React.createClass({
                         <tr>
                             <th>User Email</th>
                             <td>
-                                <UserUpdateList data={this.state.upuserdata} />
+                                <UserUpdateList data={this.state.kd_upuserdata} />
                             </td>
                         </tr>
                         <tr>
@@ -294,32 +322,32 @@ var PurchasesUpdateform = React.createClass({
                             <td>
                                 <input 
                                 type = "datetime-local" 
-                                name="uppurdate" 
-                                id="uppurdate" 
-                                value={this.state.uppurdate} 
+                                name="kd_uppurdate" 
+                                id="kd_uppurdate" 
+                                value={this.state.kd_uppurdate} 
                                 onChange={this.handleUpChange}  />
                             </td>
                         </tr>
                         <tr>
                             <th>Status</th>
                             <td>
-                                <StatusUpdateList data={this.state.upstatusdata} />
+                                <StatusUpdateList data={this.state.kd_upstatusdata} />
                             </td>
                         </tr>
                         <tr>
                             <th>Total</th>
                             <td>
                                 <input 
-                                name="uppurtotal" 
-                                id="uppurtotal" 
-                                value={this.state.uppurtotal} 
+                                name="kd_uppurtotal" 
+                                id="kd_uppurtotal" 
+                                value={this.state.kd_uppurtotal} 
                                 onChange={this.handleUpChange} 
                                 />
                             </td>
                         </tr>  
                     </tbody>
                 </table><br />
-                        <input type="hidden" name="uppurid" id="uppurid" onChange={this.handleUpChange} />
+                        <input type="hidden" name="kd_uppurid" id="kd_uppurid" onChange={this.handleUpChange} />
                         <input type="submit" value="Update Purchase" />
                     </form>
                 </div>
@@ -336,7 +364,7 @@ var PurchasesList = React.createClass({
                     key={purchases.purchaseID} // never forget this line!
                     purid={purchases.purchaseID}
                     puruser={purchases.userEmail}
-                    purdate={purchases.purchaseDate}
+                    purdate={purchases.formattedDate}
                     purstatus={purchases.purchaseStatusName}
                     purtotal={purchases.purchaseTotal}
                 >
@@ -357,8 +385,8 @@ var PurchasesList = React.createClass({
 var Purchase = React.createClass({
     getInitialState: function () {
         return {
-            uppurid: "",
-            singledata: []
+            kd_uppurid: "",
+            kd_singledata: []
         };
     },
     updateRecord: function (e) {
@@ -371,19 +399,19 @@ var Purchase = React.createClass({
         $.ajax({
             url: '/getsinglepurchase/',
             data: {
-                'uppurid': theuppurid
+                'kd_uppurid': theuppurid
             },
             dataType: 'json',
             cache: false,
             success: function (data) {
-                this.setState({ singledata: data });
-                console.log(this.state.singledata);
-                var populatePurchase = this.state.singledata.map(function (purchase) {
-                    uppurid.value = theuppurid;
+                this.setState({ kd_singledata: data });
+                console.log(this.state.kd_singledata);
+                var populatePurchase = this.state.kd_singledata.map(function (purchase) {
+                    kd_uppurid.value = theuppurid;
                     uppuruser.value = purchase.userID;
-                    uppurdate.value = purchase.purchaseDate;
+                    kd_uppurdate.value = purchase.purchaseDate;
                     uppurstatus.value = purchase.purchaseStatusID;
-                    uppurtotal.value = purchase.purchaseTotal;
+                    kd_uppurtotal.value = purchase.purchaseTotal;
 
                 });
             }.bind(this),

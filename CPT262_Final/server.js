@@ -5,6 +5,11 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
 var bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+
+const jwtKey = 'my_secret_key'
+const jwtExpirySeconds = 3000
 
 const mysql = require('mysql2');
 const e = require('express');
@@ -25,17 +30,102 @@ app.set('port', (process.env.PORT || 3000));
 
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', function (req, res){
-    res.sendFile(path.join(__dirname + '/public/insertClient.html'));
+    res.sendFile(path.join(__dirname + '/public/login.html'));
 });
 
 // < ------------------------- Login ------------------------- > //
 
+app.get('/getloggedoutback/', function (req, res) {
+    res.cookie('token', 2, { maxAge: 0 })
+    res.send({ redirect: '/backend/index.html'});
+});
+
+app.get('/getloggedinback/', function (req, res) {
+
+    var viewpage = 0;
+    const validtoken = req.cookies.token
+    console.log('token new:', validtoken);
+    var payload;
+    
+    if(!validtoken) {
+        viewpage = 0;
+        console.log("Not Valid Token");
+    } else {
+        try {
+            payload = jwt.verify(validtoken, jwtKey);
+            if (!payload) {
+                console.log("Payload is undefined!");
+            } else {
+                console.log("Token Payload:", payload);
+                console.log('Client ID:', payload.clientid || payload.userid);
+            }
+            viewpage = payload.userid;
+          } catch (e) {
+            if (e instanceof jwt.JsonWebTokenError) {
+                console.error("Token Verification Error:", e);
+                viewpage = 0;
+                console.log("Not Valid Token 2");
+            }
+            viewpage = 0;
+            console.log("Not Valid Token 3");
+          }
+    }
+    
+    console.log("View: " + viewpage);
+    
+    return res.send(JSON.stringify(viewpage));
+    
+});
+
+app.get('/getloggedoutfront/', function (req, res) {
+    res.cookie('token', 2, { maxAge: 0 })
+    res.send({ redirect: 'login.html'});
+});
+
+app.get('/getloggedinfront/', function (req, res) {
+
+    var viewpage = 0;
+    const validtoken = req.cookies.token
+    console.log('token new:', validtoken);
+    var payload;
+    
+    if(!validtoken) {
+        viewpage = 0;
+        console.log("Not Valid Token");
+    } else {
+        try {
+            payload = jwt.verify(validtoken, jwtKey);
+            if (!payload) {
+                console.log("Payload is undefined!");
+            } else {
+                console.log("Token Payload:", payload); 
+                console.log('Client ID:', payload.clientid || payload.userid);
+            }
+            viewpage = payload.clientid;
+          } catch (e) {
+            if (e instanceof jwt.JsonWebTokenError) {
+                console.error("Token Verification Error:", e);
+                viewpage = 0;
+                console.log("Not Valid Token 2");
+            }
+            viewpage = 0;
+            console.log("Not Valid Token 3");
+          }
+    }
+    
+    console.log("View: " + viewpage);
+    
+    return res.send(JSON.stringify(viewpage));
+    
+});
+
 app.post('/loginback/', function (req, res) {
-    var uemail = req.body.useremail;
-    var upw = req.body.userpw;
+    var uemail = req.body.kd_useremail;
+    var upw = req.body.kd_userpw;
 
     var sqlsel = `SELECT * 
                 FROM Users 
@@ -49,7 +139,8 @@ app.post('/loginback/', function (req, res) {
     con.query(sql, function (err, data)     {
         //Checks to see if there is data in the result
         if (data.length > 0) {
-            console.log("User name correct: ");
+            console.log("Email correct: ");
+            var userid=data[0].userID;
             console.log(data[0].userPassword);
 
             bcrypt.compare(upw, data[0].userPassword, function (err, passwordCorrect ) {
@@ -59,6 +150,11 @@ app.post('/loginback/', function (req, res) {
                     console.log("Password Incorrect");
                 } else {
                     console.log("Password Correct");
+                    const token = jwt.sign({ userid }, jwtKey, {
+                        algorithm: 'HS256',
+                        expiresIn: jwtExpirySeconds
+                    });
+                    res.cookie('token', token, { maxAge: jwtExpirySeconds * 1000 })
                     res.send({ redirect: '/backend/searchUser.html'});
                 }
             });
@@ -69,8 +165,8 @@ app.post('/loginback/', function (req, res) {
 });
 
 app.post('/loginfront/', function (req, res) {
-    var cemail = req.body.clientemail;
-    var cpw = req.body.clientpw;
+    var cemail = req.body.kd_clientemail;
+    var cpw = req.body.kd_clientpw;
 
     var sqlsel = `SELECT * 
                 FROM Clients 
@@ -85,6 +181,7 @@ app.post('/loginfront/', function (req, res) {
         //Checks to see if there is data in the result
         if (data.length > 0) {
             console.log("Email correct: ");
+            var cliid=data[0].clientID;
             console.log(data[0].clientPassword);
 
             bcrypt.compare(cpw, data[0].clientPassword, function (err, passwordCorrect ) {
@@ -94,7 +191,12 @@ app.post('/loginfront/', function (req, res) {
                     console.log("Password Incorrect");
                 } else {
                     console.log("Password Correct");
-                    res.send({ redirect: '/insertAppointment.html'});
+                    const token = jwt.sign({ clientid: cliid }, jwtKey, {
+                        algorithm: 'HS256',
+                        expiresIn: jwtExpirySeconds
+                    });
+                    res.cookie('token', token, { maxAge: jwtExpirySeconds * 1000 })
+                    res.send({ redirect: '/insertClient.html'});
                 }
             });
         } else {
@@ -109,11 +211,11 @@ app.post('/loginfront/', function (req, res) {
 
 app.post('/appointment/', function (req, res,) {
 
-    var aservice = req.body.appointmentservice;
-    var aclient = req.body.appointmentclient;
-    var astatus = req.body.appointmentstatus;
-    var astart = req.body.appointmentstart;
-    var aend = req.body.appointmentend;
+    var aservice = req.body.kd_appointmentservice;
+    var aclient = req.body.kd_appointmentclient;
+    var astatus = req.body.kd_appointmentstatus;
+    var astart = req.body.kd_appointmentstart;
+    var aend = req.body.kd_appointmentend;
 
     var sqlins = `INSERT INTO Appointments
                 (serviceID, clientID, appointmentStatusID, appointmentStart, 
@@ -133,12 +235,12 @@ app.post('/appointment/', function (req, res,) {
 });
 
 app.get('/getappointment/', function (req, res) {
-    var aid = req.query.appointmentid;
-    var aservice = req.query.appointmentservice;
-    var aclient = req.query.appointmentclient;
-    var astart = req.query.appointmentstart;
-    var aend = req.query.appointmentend;
-    var astatus = req.query.appointmentstatus;
+    var aid = req.query.kd_appointmentid;
+    var aservice = req.query.kd_appointmentservice;
+    var aclient = req.query.kd_appointmentclient;
+    var astart = req.query.kd_appointmentstart;
+    var aend = req.query.kd_appointmentend;
+    var astatus = req.query.kd_appointmentstatus;
 
     var sqlsel = `SELECT a.appointmentID, 
                 ap.appointmentStatusName, 
@@ -226,7 +328,7 @@ app.get('/getappointment/', function (req, res) {
 
 app.get('/getsingleappointment/', function (req, res) {
 
-    var aid = req.query.upapptid;
+    var aid = req.query.kd_upapptid;
 
     var sqlsel = `SELECT * FROM Appointments WHERE appointmentID = ?`;
     var inserts = [aid];
@@ -245,12 +347,12 @@ app.get('/getsingleappointment/', function (req, res) {
 
 app.post('/updatesingleappointment', function (req, res, ) {
 
-    var aid = req.body.upappointmentid;
-    var aclient = req.body.upappointmentclient;
-    var astart = req.body.upappointmentstart;
-    var aend = req.body.upappointmentend;
-    var aservice = req.body.upappointmentservice;
-    var astatus = req.body.upappointmentstatus;
+    var aid = req.body.kd_upappointmentid;
+    var aclient = req.body.kd_upappointmentclient;
+    var astart = req.body.kd_upappointmentstart;
+    var aend = req.body.kd_upappointmentend;
+    var aservice = req.body.kd_upappointmentservice;
+    var astatus = req.body.kd_upappointmentstatus;
     
     var sqlins = `UPDATE Appointments 
                 SET clientID = ?, 
@@ -318,11 +420,11 @@ app.get('/getapptstatus/', function (req, res) {
 
 app.post('/client/', function (req, res,) {
 
-    var cfname = req.body.clientfname;
-    var clname = req.body.clientlname;
-    var cphone = req.body.clientphone;
-    var cemail = req.body.clientemail
-    var cpw = req.body.clientpw;
+    var cfname = req.body.kd_clientfname;
+    var clname = req.body.kd_clientlname;
+    var cphone = req.body.kd_clientphone;
+    var cemail = req.body.kd_clientemail
+    var cpw = req.body.kd_clientpw;
 
     var saltRounds = 10;
     var theHashedPW = '';
@@ -357,11 +459,11 @@ app.post('/client/', function (req, res,) {
 
 app.get('/getclient/', function (req, res) {
 
-    var cid = req.query.clientid;
-    var cfname = req.query.clientfname;
-    var clname = req.query.clientlname;
-    var cphone = req.query.clientphone;
-    var cemail = req.query.clientemail;
+    var cid = req.query.kd_clientid;
+    var cfname = req.query.kd_clientfname;
+    var clname = req.query.kd_clientlname;
+    var cphone = req.query.kd_clientphone;
+    var cemail = req.query.kd_clientemail;
 
     var sqlsel = `SELECT * FROM Clients
                 WHERE 1=1`;
@@ -427,7 +529,7 @@ app.get('/getclient/', function (req, res) {
 
 app.get('/getsingleclient/', function (req, res) {
 
-    var cid = req.query.upcliid;
+    var cid = req.query.kd_upcliid;
 
     var sqlsel = `SELECT * FROM Clients WHERE clientID = ?`;
     var inserts = [cid];
@@ -446,11 +548,11 @@ app.get('/getsingleclient/', function (req, res) {
 
 app.post('/updatesingleclient', function (req, res, ) {
 
-    var cid = req.body.upclientid;
-    var cemail = req.body.upclientemail;
-    var cfname = req.body.upclientfname;
-    var clname = req.body.upclientlname;
-    var cphone = req.body.upclientphone;
+    var cid = req.body.kd_upclientid;
+    var cemail = req.body.kd_upclientemail;
+    var cfname = req.body.kd_upclientfname;
+    var clname = req.body.kd_upclientlname;
+    var cphone = req.body.kd_upclientphone;
     
     var sqlins = `UPDATE Clients 
                 SET clientEmail = ?, 
@@ -488,9 +590,9 @@ app.get('/getusers/', function (req, res) {
 
 app.post('/inventory/', function (req, res,) {
 
-    var ilevel = req.body.inventorylevel;
-    var ilastupdated = req.body.inventorylastupdated;
-    var iproduct = req.body.inventoryproduct;
+    var ilevel = req.body.kd_inventorylevel;
+    var ilastupdated = req.body.kd_inventorylastupdated;
+    var iproduct = req.body.kd_inventoryproduct;
 
     var sqlins = `INSERT INTO Inventory
                 (inventoryLevel, productID, inventoryLastUpdated)
@@ -509,10 +611,10 @@ app.post('/inventory/', function (req, res,) {
 });
 
 app.get('/getinventory/', function (req, res) {
-    var iid = req.query.inventoryid;
-    var ilevel = req.query.inventorylevel;
-    var ilastupdated = req.query.inventorylastupdated;
-    var iproduct = req.query.inventoryproduct;
+    var iid = req.query.kd_inventoryid;
+    var ilevel = req.query.kd_inventorylevel;
+    var ilastupdated = req.query.kd_inventorylastupdated;
+    var iproduct = req.query.kd_inventoryproduct;
 
     var sqlsel = `SELECT i.*, p.productName,
                 DATE_FORMAT(i.inventoryLastUpdated, '%Y-%m-%d %H:%i:%s') AS formattedupdate
@@ -575,7 +677,7 @@ app.get('/getinventory/', function (req, res) {
 
 app.get('/getsingleinventory/', function (req, res) {
 
-    var iid = req.query.upinvid;
+    var iid = req.query.kd_upinvid;
 
     var sqlsel = `SELECT * FROM Inventory WHERE inventoryID = ?`;
     var inserts = [iid];
@@ -594,10 +696,10 @@ app.get('/getsingleinventory/', function (req, res) {
 
 app.post('/updatesingleinventory', function (req, res, ) {
 
-    var iid = req.body.upinventoryid;
-    var ilevel = req.body.upinventorylevel;
-    var iproduct = req.body.upinventoryproduct;
-    var ilastupdated = req.body.upinventorylastupdated;
+    var iid = req.body.kd_upinventoryid;
+    var ilevel = req.body.kd_upinventorylevel;
+    var iproduct = req.body.kd_upinventoryproduct;
+    var ilastupdated = req.body.kd_upinventorylastupdated;
     
     var sqlins = `UPDATE Inventory 
                 SET inventoryLevel = ?, 
@@ -634,9 +736,9 @@ app.get('/getproducts/', function (req, res) {
 
 app.post('/product/', function (req, res, ) { 
 
-    var pname = req.body.productname;
-    var pquantity = req.body.productquantity;
-    var pprice = req.body.productprice;
+    var pname = req.body.kd_productname;
+    var pquantity = req.body.kd_productquantity;
+    var pprice = req.body.kd_productprice;
     console.log(pname); 
 
 
@@ -655,10 +757,10 @@ app.post('/product/', function (req, res, ) {
 });
 
 app.get('/getproduct/', function (req, res) {
-    var pid = req.query.productid;
-    var pname = req.query.productname;
-    var pprice = req.query.productprice;
-    var pquantity = req.query.productquantity;
+    var pid = req.query.kd_productid;
+    var pname = req.query.kd_productname;
+    var pprice = req.query.kd_productprice;
+    var pquantity = req.query.kd_productquantity;
 
     var sqlsel = `SELECT * FROM Products 
                 WHERE 1=1`;
@@ -716,7 +818,7 @@ app.get('/getproduct/', function (req, res) {
 
 app.get('/getsingleproduct/', function (req, res) {
 
-    var pid = req.query.upprodid;
+    var pid = req.query.kd_upprodid;
 
     var sqlsel = `SELECT * FROM Products WHERE productID = ?`;
     var inserts = [pid];
@@ -735,10 +837,10 @@ app.get('/getsingleproduct/', function (req, res) {
 
 app.post('/updatesingleproduct', function (req, res, ) {
 
-    var pid = req.body.upproductid;
-    var pname = req.body.upproductname;
-    var pprice = req.body.upproductprice;
-    var pquantity = req.body.upproductquantity;
+    var pid = req.body.kd_upproductid;
+    var pname = req.body.kd_upproductname;
+    var pprice = req.body.kd_upproductprice;
+    var pquantity = req.body.kd_upproductquantity;
     
     var sqlins = `UPDATE Products 
                 SET productName = ?, 
@@ -761,10 +863,10 @@ console.log(sql);
 
 app.post('/purchases/', function (req, res, ) { 
 
-    var puser= req.body.purchaseuser;
-    var pdate = req.body.purchasedate;
-    var pstatus = req.body.purchasestatus;
-    var ptotal = req.body.purchasetotal;
+    var puser= req.body.kd_purchaseuser;
+    var pdate = req.body.kd_purchasedate;
+    var pstatus = req.body.kd_purchasestatus;
+    var ptotal = req.body.kd_purchasetotal;
     console.log(pdate); 
 
 
@@ -783,13 +885,16 @@ app.post('/purchases/', function (req, res, ) {
 });
 
 app.get('/getpurchases/', function (req, res) {
-    var pid = req.query.purchaseid;
-    var puser = req.query.purchaseuser;
-    var pdate = req.query.purchasedate;
-    var pstatus = req.query.purchasestatus;
-    var ptotal = req.query.purchasetotal;
+    var pid = req.query.kd_purchaseid;
+    var puser = req.query.kd_purchaseuser;
+    var pdate = req.query.kd_purchasedate;
+    var pstatus = req.query.kd_purchasestatus;
+    var ptotal = req.query.kd_purchasetotal;
 
-    var sqlsel = `SELECT p.*, u.userEmail, s.purchaseStatusName
+    var sqlsel = `SELECT p.*, 
+                u.userEmail, 
+                s.purchaseStatusName,
+                DATE_FORMAT(p.purchaseDate, '%Y-%m-%d %H:%i:%s') AS formattedDate
                 FROM Purchases p
                 INNER JOIN Users u ON p.userID = u.userID
                 INNER JOIN purchaseStatus s ON p.purchaseStatusID = s.purchaseStatusID
@@ -858,7 +963,7 @@ app.get('/getpurchases/', function (req, res) {
 
 app.get('/getsinglepurchase/', function (req, res) {
 
-    var pid = req.query.uppurid;
+    var pid = req.query.kd_uppurid;
 
     var sqlsel = `SELECT * FROM Purchases WHERE purchaseID = ?`;
     var inserts = [pid];
@@ -877,11 +982,11 @@ app.get('/getsinglepurchase/', function (req, res) {
 
 app.post('/updatesinglepurchase/', function (req, res, ) {
 
-    var pid = req.body.uppurchaseid;
-    var puser = req.body.uppurchaseuser;
-    var pdate = req.body.uppurchasedate;
-    var pstatus = req.body.uppurchasestatus;
-    var ptotal = req.body.uppurchasetotal;
+    var pid = req.body.kd_uppurchaseid;
+    var puser = req.body.kd_uppurchaseuser;
+    var pdate = req.body.kd_uppurchasedate;
+    var pstatus = req.body.kd_uppurchasestatus;
+    var ptotal = req.body.kd_uppurchasetotal;
     
     var sqlins = `UPDATE Purchases 
                 SET userID = ?, 
@@ -919,10 +1024,10 @@ app.get('/getpstatus/', function (req, res) {
 
 app.post('/purchasedets/', function (req, res, ) { 
 
-    var ppurchaseid = req.body.purchasedetpurchaseid;
-    var pproduct = req.body.purchasedetproduct;
-    var pquantity = req.body.purchasedetquantity;
-    var ptotal = req.body.purchasedettotal;
+    var ppurchaseid = req.body.kd_purchasedetpurchaseid;
+    var pproduct = req.body.kd_purchasedetproduct;
+    var pquantity = req.body.kd_purchasedetquantity;
+    var ptotal = req.body.kd_purchasedettotal;
     console.log(ptotal); 
 
 
@@ -941,11 +1046,11 @@ app.post('/purchasedets/', function (req, res, ) {
 });
 
 app.get('/getpurchasedets/', function (req, res) {
-    var pid = req.query.purchasedetid;
-    var ppurchaseid = req.query.purchasedetpurchaseid;
-    var pproduct = req.query.purchasedetproduct;
-    var pquantity = req.query.purchasedetquantity;
-    var ptotal = req.query.purchasedettotal;
+    var pid = req.query.kd_purchasedetid;
+    var ppurchaseid = req.query.kd_purchasedetpurchaseid;
+    var pproduct = req.query.kd_purchasedetproduct;
+    var pquantity = req.query.kd_purchasedetquantity;
+    var ptotal = req.query.kd_purchasedettotal;
 
     var sqlsel = `SELECT pd.*, p.productName
                 FROM purchaseDetails pd
@@ -1015,7 +1120,7 @@ app.get('/getpurchasedets/', function (req, res) {
 
 app.get('/getsinglepurchasedets/', function (req, res) {
 
-    var pid = req.query.uppurdetid;
+    var pid = req.query.kd_uppurdetid;
 
     var sqlsel = `SELECT * FROM purchaseDetails WHERE purchaseDetailID = ?`;
     var inserts = [pid];
@@ -1034,11 +1139,11 @@ app.get('/getsinglepurchasedets/', function (req, res) {
 
 app.post('/updatesinglepurchasedets', function (req, res, ) {
 
-    var pid = req.body.uppurchasedetid;
-    var ppurchaseid = req.body.uppurchasedetpurchaseid;
-    var pproduct = req.body.uppurchasedetproduct;
-    var pquantity = req.body.uppurchasedetquantity;
-    var ptotal = req.body.uppurchasedettotal;
+    var pid = req.body.kd_uppurchasedetid;
+    var ppurchaseid = req.body.kd_uppurchasedetpurchaseid;
+    var pproduct = req.body.kd_uppurchasedetproduct;
+    var pquantity = req.body.kd_uppurchasedetquantity;
+    var ptotal = req.body.kd_uppurchasedettotal;
     
     var sqlins = `UPDATE purchaseDetails
                 SET purchaseID = ?, 
@@ -1061,9 +1166,9 @@ app.post('/updatesinglepurchasedets', function (req, res, ) {
 // < ---------------------------- Users ---------------------------- > //
 
 app.post('/user/', function (req, res) {
-    var ucategoryid = req.body.usercategoryid;
-    var uemail = req.body.useremail;
-    var upw = req.body.userpw;
+    var ucategoryid = req.body.kd_usercategoryid;
+    var uemail = req.body.kd_useremail;
+    var upw = req.body.kd_userpw;
     console.log("PW: " + upw);
 
     var saltRounds = 10;
@@ -1098,9 +1203,9 @@ app.post('/user/', function (req, res) {
 });
 
 app.get('/getuser/', function (req, res) {
-    var uid = req.query.userid;
-    var ucategory = req.query.usercategory;
-    var uemail = req.query.useremail;
+    var uid = req.query.kd_userid;
+    var ucategory = req.query.kd_usercategory;
+    var uemail = req.query.kd_useremail;
 
     var sqlsel = `SELECT u.*, c.userCategoryName
                 FROM Users u
@@ -1152,7 +1257,7 @@ app.get('/getuser/', function (req, res) {
 
 app.get('/getsingleuser/', function (req, res) {
 
-    var uid = req.query.upusid;
+    var uid = req.query.kd_upusid;
 
     var sqlsel = `SELECT * FROM Users WHERE userID = ?`;
     var inserts = [uid];
@@ -1171,9 +1276,9 @@ app.get('/getsingleuser/', function (req, res) {
 
 app.post('/updatesingleuser/', function (req, res, ) {
 
-    var uid = req.body.upuserid;
-    var ucategory = req.body.upusercategory;
-    var uemail = req.body.upuseremail;
+    var uid = req.body.kd_upuserid;
+    var ucategory = req.body.kd_upusercategory;
+    var uemail = req.body.kd_upuseremail;
     
     var sqlins = `UPDATE Users
                 SET userCategoryID = ?, 
@@ -1210,10 +1315,10 @@ app.get('/getcategory/', function (req, res) {
 
 app.post('/services/', function (req, res, ) { 
 
-    var sname = req.body.servicename;
-    var sblocks = req.body.serviceblocks;
-    var sprice = req.body.serviceprice;
-    console.log(sname); 
+    var sname = req.body.kd_servicename;
+    var sblocks = req.body.kd_serviceblocks;
+    var sprice = req.body.kd_serviceprice;
+    console.log(sprice); 
 
 
     var sqlins = `INSERT INTO Services 
@@ -1231,10 +1336,10 @@ app.post('/services/', function (req, res, ) {
 });
 
 app.get('/getservices/', function (req, res) {
-    var sid = req.query.serviceid;
-    var sname = req.query.servicename;
-    var sblocks = req.query.serviceblocks;
-    var sprice = req.query.serviceprice;
+    var sid = req.query.kd_serviceid;
+    var sname = req.query.kd_servicename;
+    var sblocks = req.query.kd_serviceblocks;
+    var sprice = req.query.kd_serviceprice;
 
     var sqlsel = `SELECT * FROM Services 
                 WHERE 1=1`;
@@ -1294,7 +1399,7 @@ app.get('/getservices/', function (req, res) {
 
 app.get('/getsingleservice/', function (req, res) {
 
-    var sid = req.query.upservid;
+    var sid = req.query.kd_upservid;
 
     var sqlsel = `SELECT * FROM Services WHERE serviceID = ?`;
     var inserts = [sid];
@@ -1313,10 +1418,10 @@ app.get('/getsingleservice/', function (req, res) {
 
 app.post('/updatesingleservice', function (req, res, ) {
 
-    var sid = req.body.upserviceid;
-    var sname = req.body.upservicename;
-    var sblocks = req.body.upserviceblocks;
-    var sprice = req.body.upserviceprice;
+    var sid = req.body.kd_upserviceid;
+    var sname = req.body.kd_upservicename;
+    var sblocks = req.body.kd_upserviceblocks;
+    var sprice = req.body.kd_upserviceprice;
     
     var sqlins = `UPDATE Services
                 SET serviceName = ?, 

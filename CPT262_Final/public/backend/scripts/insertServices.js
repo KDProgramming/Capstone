@@ -1,5 +1,39 @@
+var ususer = 0;
 var ServicesBox = React.createClass({
-
+    getInitialState: function() {
+        return { viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
+    },
+    componentDidMount: function () {
+        this.loadAllowLogin();
+    }, 
+    handleAppointmentSubmit: function (appointment) {
+        $.ajax({ 
+            url: '/appointment/',
+            dataType: 'json',
+            type: 'POST',
+            data: appointment,
+            success: function (data) {
+                this.setState({ data: data}); 
+            }.bind(this), 
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
+    }, 
     handleServicesSubmit: function (services) {
         $.ajax({ 
             url: '/services/',
@@ -15,21 +49,30 @@ var ServicesBox = React.createClass({
         });
     },
     render: function () {
-        return (
-            <div className="ServicesBox">
-                <h1>Insert Service</h1>
-                <Servicesform2 onServicesSubmit={this.handleServicesSubmit}/>
-            </div>
-        );
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
+                </div>
+            );
+        } else { 
+            return (
+                <div className="ServicesBox">
+                    <h1>Insert Service</h1>
+                    <Servicesform2 onServicesSubmit={this.handleServicesSubmit}/>
+                </div>
+            );
+        }
     }
 });
 
 var Servicesform2 = React.createClass({
     getInitialState: function () {
         return {
-            servicename: "",
-            serviceblocks: "",
-            serviceprice: "",
+            kd_servicename: "",
+            kd_serviceblocks: "",
+            kd_serviceprice: "",
         };
     },
 
@@ -37,23 +80,23 @@ var Servicesform2 = React.createClass({
         e.preventDefault(); 
         
 
-        var servicename = this.state.servicename.trim();
-        var serviceblocks = this.state.serviceblocks.trim();
-        var serviceprice = this.state.serviceprice.trim();
+        var kd_servicename = this.state.kd_servicename.trim();
+        var kd_serviceblocks = this.state.kd_serviceblocks.trim();
+        var kd_serviceprice = this.state.kd_serviceprice.trim();
 
-        if (!servicename || !serviceblocks || !serviceprice) {
+        if (!kd_servicename || !kd_serviceblocks || !kd_serviceprice) {
             console.log("Field Missing");
             return;
         }
 
-        if (serviceblocks !== '1' && serviceblocks !== '2') {
+        if (kd_serviceblocks !== '1' && kd_serviceblocks !== '2') {
             console.log("Service Blocks Must Be 1 or 2!");
         }
 
         this.props.onServicesSubmit({ 
-            servicename: servicename,
-            serviceblocks: serviceblocks,
-            serviceprice: serviceprice,
+            kd_servicename: kd_servicename,
+            kd_serviceblocks: kd_serviceblocks,
+            kd_serviceprice: kd_serviceprice,
         });
     },
     validateDollars: function (value) {
@@ -79,13 +122,13 @@ var Servicesform2 = React.createClass({
                             <th>Service Name</th>
                             <td>
                                 <TextInput
-                                    value={this.state.servicename}
-                                    uniqueName="servicename"
+                                    value={this.state.kd_servicename}
+                                    uniqueName="kd_servicename"
                                     textArea={false}
                                     required={true}
                                     minCharacters={1}
                                     validate={this.commonValidate}
-                                    onChange={this.setValue.bind(this, 'servicename')}
+                                    onChange={this.setValue.bind(this, 'kd_servicename')}
                                     errorMessage="Service Name is invalid"
                                     emptyMessage="Service Name is required" />
                             </td>
@@ -94,13 +137,13 @@ var Servicesform2 = React.createClass({
                             <th>Service Blocks</th>
                             <td>
                                 <TextInput
-                                    value={this.state.serviceblocks}
-                                    uniqueName="serviceblocks"
+                                    value={this.state.kd_serviceblocks}
+                                    uniqueName="kd_serviceblocks"
                                     textArea={false}
                                     required={true}
                                     minCharacters={1}
                                     validate={this.commonValidate}
-                                    onChange={this.setValue.bind(this, 'serviceblocks')}
+                                    onChange={this.setValue.bind(this, 'kd_serviceblocks')}
                                     errorMessage="Service Blocks is invalid"
                                     emptyMessage="Service Blocks is required" />
                             </td>
@@ -109,12 +152,12 @@ var Servicesform2 = React.createClass({
                             <th>Service Price</th>
                             <td>
                                 <TextInput
-                                    value={this.state.serviceprice}
-                                    uniqueName="serviceprice"
+                                    value={this.state.kd_serviceprice}
+                                    uniqueName="kd_serviceprice"
                                     textArea={false}
                                     required={true}
                                     validate={this.validateDollars}
-                                    onChange={this.setValue.bind(this, 'serviceprice')}
+                                    onChange={this.setValue.bind(this, 'kd_serviceprice')}
                                     errorMessage="Service Price is invalid"
                                     emptyMessage="Service Price is required" />
                             </td>

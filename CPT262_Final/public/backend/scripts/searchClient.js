@@ -1,16 +1,34 @@
+var ususer = 0;
 var ClientBox = React.createClass({
     getInitialState: function () {
-        return { data: [] };
+        return { data: [], viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                if (data !== 0) {
+                    this.loadClientFromServer();
+                }
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
     },
     loadClientFromServer: function () {
         $.ajax({
             url: '/getclient/',
             data: {
-                'clientid': clientid.value,
-                'clientemail': clientemail.value,
-                'clientfname': clientfname.value,
-                'clientlname': clientlname.value,
-                'clientphone': clientphone.value,          
+                'kd_clientid': kd_clientid.value,
+                'kd_clientemail': kd_clientemail.value,
+                'kd_clientfname': kd_clientfname.value,
+                'kd_clientlname': kd_clientlname.value,
+                'kd_clientphone': kd_clientphone.value,          
             },
             
             dataType: 'json',
@@ -26,59 +44,69 @@ var ClientBox = React.createClass({
 
     },
     componentDidMount: function () {
+        this.loadAllowLogin();
         this.loadClientFromServer();
     },
 
     render: function () {
-        return (
-            <div>
-                <h1>Client Search</h1>
-                <Clientform2 onClientSubmit={this.loadClientFromServer} />
-                <br />
-                <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Email</th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
-                                <th>Phone</th>
-                            </tr>
-                         </thead>
-                        <ClientList data={this.state.data} />
-                    </table>
-                
-            </div>
-        );
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
+                </div>
+            );
+        } else { 
+            return (
+                <div>
+                    <h1>Client Search</h1>
+                    <Clientform2 onClientSubmit={this.loadClientFromServer} />
+                    <br />
+                    <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Email</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Phone</th>
+                                </tr>
+                            </thead>
+                            <ClientList data={this.state.data} />
+                        </table>
+                    
+                </div>
+            );
+        }
     }
 });
 
 var Clientform2 = React.createClass({
     getInitialState: function () {
         return {
-            clientid: "",
-            clientemail: "",
-            clientfname: "",
-            clientlname: "",
-            clientphone: "",
+            kd_clientid: "",
+            kd_clientemail: "",
+            kd_clientfname: "",
+            kd_clientlname: "",
+            kd_clientphone: "",
         };
     },
 
     handleSubmit: function (e) {
         e.preventDefault();
 
-        var clientid = this.state.clientid.trim();
-        var clientemail = this.state.clientemail.trim();
-        var clientfname = this.state.clientfname.trim();
-        var clientlname = this.state.clientlname.trim();
-        var clientphone = this.state.clientphone.trim();
+        var kd_clientid = this.state.kd_clientid.trim();
+        var kd_clientemail = this.state.kd_clientemail.trim();
+        var kd_clientfname = this.state.kd_clientfname.trim();
+        var kd_clientlname = this.state.kd_clientlname.trim();
+        var kd_clientphone = this.state.kd_clientphone.trim();
 
         this.props.onClientSubmit({ 
-            clientid: clientid, 
-            clientemail: clientemail, 
-            clientfname: clientfname, 
-            clientlname: clientlname, 
-            clientphone: clientphone,
+            kd_clientid: kd_clientid, 
+            kd_clientemail: kd_clientemail, 
+            kd_clientfname: kd_clientfname, 
+            kd_clientlname: kd_clientlname, 
+            kd_clientphone: kd_clientphone,
         });
     },
 
@@ -99,9 +127,9 @@ var Clientform2 = React.createClass({
                             <td>
                                 <input 
                                 type="text" 
-                                name="clientid" 
-                                id="clientid" 
-                                value={this.state.clientid} 
+                                name="kd_clientid" 
+                                id="kd_clientid" 
+                                value={this.state.kd_clientid} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -111,9 +139,9 @@ var Clientform2 = React.createClass({
                             <td>
                                 <input 
                                 type="text" 
-                                name="clientemail" 
-                                id="clientemail" 
-                                value={this.state.clientemail} 
+                                name="kd_clientemail" 
+                                id="kd_clientemail" 
+                                value={this.state.kd_clientemail} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -122,9 +150,9 @@ var Clientform2 = React.createClass({
                             <th>First Name</th>
                             <td>
                                 <input 
-                                name="clientfname" 
-                                id="clientfname" 
-                                value={this.state.clientfname} 
+                                name="kd_clientfname" 
+                                id="kd_clientfname" 
+                                value={this.state.kd_clientfname} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -133,9 +161,9 @@ var Clientform2 = React.createClass({
                             <th>Last Name</th>
                             <td>
                                 <input 
-                                name="clientlname" 
-                                id="clientlname" 
-                                value={this.state.clientlname} 
+                                name="kd_clientlname" 
+                                id="kd_clientlname" 
+                                value={this.state.kd_clientlname} 
                                 onChange={this.handleChange}  
                                 />
                             </td>
@@ -144,9 +172,9 @@ var Clientform2 = React.createClass({
                             <th>Phone</th>
                             <td>
                                 <input 
-                                name="clientphone" 
-                                id="clientphone" 
-                                value={this.state.clientphone} 
+                                name="kd_clientphone" 
+                                id="kd_clientphone" 
+                                value={this.state.kd_clientphone} 
                                 onChange={this.handleChange} 
                                 />
                             </td>

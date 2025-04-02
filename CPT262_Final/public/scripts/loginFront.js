@@ -38,20 +38,20 @@ var LoginBox = React.createClass({
 var LoginForm = React.createClass({
     getInitialState: function () {
         return {
-            clientemail: "",
-            clientpw: "",
+            kd_clientemail: "",
+            kd_clientpw: "",
         };
     },
    
     handleSubmit: function (e) {
         e.preventDefault();
 
-        var clientemail = this.state.clientemail.trim();
-        var clientpw = this.state.clientpw.trim();
+        var kd_clientemail = this.state.kd_clientemail.trim();
+        var kd_clientpw = this.state.kd_clientpw.trim();
       
         this.props.onLoginSubmit({
-            clientemail: clientemail,
-            clientpw: clientpw
+            kd_clientemail: kd_clientemail,
+            kd_clientpw: kd_clientpw
         });
 
     },
@@ -73,9 +73,9 @@ var LoginForm = React.createClass({
                                     <th>Email</th>
                                     <td>
                                         <input 
-                                        name="clientemail" 
-                                        id="clientemail" 
-                                        value={this.state.clientemail} 
+                                        name="kd_clientemail" 
+                                        id="kd_clientemail" 
+                                        value={this.state.kd_clientemail} 
                                         onChange={this.handleChange} />
                                     </td>
                                 </tr>
@@ -84,9 +84,9 @@ var LoginForm = React.createClass({
                                     <td>
                                         <input 
                                         type = "password" 
-                                        name="clientpw" 
-                                        id="clientpw" 
-                                        value={this.state.clientpw} 
+                                        name="kd_clientpw" 
+                                        id="kd_clientpw" 
+                                        value={this.state.kd_clientpw} 
                                         onChange={this.handleChange} />
                                     </td>
                                 </tr>

@@ -1,16 +1,34 @@
+var ususer = 0;
 var PurchaseDetsBox = React.createClass({
     getInitialState: function () {
-        return { data: [] };
+        return { data: [], viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                if (data !== 0) {
+                    this.loadPurchaseDetsFromServer();
+                }
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
     },
     loadPurchaseDetsFromServer: function () {
         $.ajax({
             url: '/getpurchasedets/',
             data: {
-                'purchasedetid': purchasedetid.value,
-                'purchasedetpurchaseid': purchasedetpurchaseid.value,
-                'purchasedetproduct': purdetproduct.value,
-                'purchasedetquantity': purchasedetquantity.value,
-                'purchasedettotal': purchasedettotal.value,         
+                'kd_purchasedetid': kd_purchasedetid.value,
+                'kd_purchasedetpurchaseid': kd_purchasedetpurchaseid.value,
+                'kd_purchasedetproduct': purdetproduct.value,
+                'kd_purchasedetquantity': kd_purchasedetquantity.value,
+                'kd_purchasedettotal': kd_purchasedettotal.value,         
             },
             
             dataType: 'json',
@@ -42,48 +60,58 @@ var PurchaseDetsBox = React.createClass({
         window.location.reload(true);
     },
     componentDidMount: function () {
+        this.loadAllowLogin();
         this.loadPurchaseDetsFromServer();
     },
 
     render: function () {
-        return (
-            <div>
-                <h1>Update Purchase Details</h1>
-                <PurchaseDetsform2 onPurchaseDetsSubmit={this.loadPurchaseDetsFromServer} />
-                <br />
-                <div id = "theresults">
-                    <div id = "theleft">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Purchase ID</th>
-                                <th>Product</th>
-                                <th>Quantity</th>
-                                <th>Total</th>
-                                <th></th>
-                            </tr>
-                         </thead>
-                        <PurchaseDetsList data={this.state.data} />
-                    </table>
-                    </div>
-                    <div id="theright">
-                        <PurchaseDetsUpdateform onUpdateSubmit={this.updateSinglePurchaseDetsFromServer} />
-                    </div>                
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
                 </div>
-            </div>
-        );
+            );
+        } else { 
+            return (
+                <div>
+                    <h1>Update Purchase Details</h1>
+                    <PurchaseDetsform2 onPurchaseDetsSubmit={this.loadPurchaseDetsFromServer} />
+                    <br />
+                    <div id = "theresults">
+                        <div id = "theleft">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Purchase ID</th>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <PurchaseDetsList data={this.state.data} />
+                        </table>
+                        </div>
+                        <div id="theright">
+                            <PurchaseDetsUpdateform onUpdateSubmit={this.updateSinglePurchaseDetsFromServer} />
+                        </div>                
+                    </div>
+                </div>
+            );
+        }
     }
 });
 
 var PurchaseDetsform2 = React.createClass({
     getInitialState: function () {
         return {
-            purchasedetid: "",
-            purchasedetpurchaseid: "",
-            productdata: [],
-            purchasedetquantity: "",
-            purchasedettotal: "",
+            kd_purchasedetid: "",
+            kd_purchasedetpurchaseid: "",
+            kd_productdata: [],
+            kd_purchasedetquantity: "",
+            kd_purchasedettotal: "",
         };
     },
 
@@ -93,7 +121,7 @@ var PurchaseDetsform2 = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({productdata:data});
+                this.setState({kd_productdata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -107,18 +135,18 @@ var PurchaseDetsform2 = React.createClass({
     handleSubmit: function (e) {
         e.preventDefault();
 
-        var purchasedetid = this.state.purchasedetid.trim();
-        var purchasedetpurchaseid = this.state.purchasedetpurchaseid.trim();
-        var purchasedetproduct = purdetproduct.value;
-        var purchasedetquantity = this.state.purchasedetquantity.trim();
-        var purchasedettotal = this.state.purchasedettotal.trim();
+        var kd_purchasedetid = this.state.kd_purchasedetid.trim();
+        var kd_purchasedetpurchaseid = this.state.kd_purchasedetpurchaseid.trim();
+        var kd_purchasedetproduct = purdetproduct.value;
+        var kd_purchasedetquantity = this.state.kd_purchasedetquantity.trim();
+        var kd_purchasedettotal = this.state.kd_purchasedettotal.trim();
 
         this.props.onPurchaseDetsSubmit({ 
-            purchasedetid: purchasedetid, 
-            purchasedetpurchaseid: purchasedetpurchaseid, 
-            purchasedetproduct: purchasedetproduct, 
-            purchasedetquantity: purchasedetquantity, 
-            purchasedettotal: purchasedettotal,
+            kd_purchasedetid: kd_purchasedetid, 
+            kd_purchasedetpurchaseid: kd_purchasedetpurchaseid, 
+            kd_purchasedetproduct: kd_purchasedetproduct, 
+            kd_purchasedetquantity: kd_purchasedetquantity, 
+            kd_purchasedettotal: kd_purchasedettotal,
         });
     },
 
@@ -141,9 +169,9 @@ var PurchaseDetsform2 = React.createClass({
                             <td>
                                 <input 
                                 type="text" 
-                                name="purchasedetid" 
-                                id="purchasedetid" 
-                                value={this.state.purchasedetid} 
+                                name="kd_purchasedetid" 
+                                id="kd_purchasedetid" 
+                                value={this.state.kd_purchasedetid} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -152,9 +180,9 @@ var PurchaseDetsform2 = React.createClass({
                             <th>Purchase ID</th>
                             <td>
                                 <input 
-                                name="purchasedetpurchaseid" 
-                                id="purchasedetpurchaseid" 
-                                value={this.state.purchasedetpurchaseid} 
+                                name="kd_purchasedetpurchaseid" 
+                                id="kd_purchasedetpurchaseid" 
+                                value={this.state.kd_purchasedetpurchaseid} 
                                 onChange={this.handleChange}  
                                 />
                             </td>
@@ -162,16 +190,16 @@ var PurchaseDetsform2 = React.createClass({
                         <tr>
                             <th>Product</th>
                             <td>
-                                <ProductList data={this.state.productdata} />
+                                <ProductList data={this.state.kd_productdata} />
                             </td>
                         </tr>
                         <tr>
                             <th>Quantity</th>
                             <td>
                                 <input 
-                                name="purchasedetquantity" 
-                                id="purchasedetquantity" 
-                                value={this.state.purchasedetquantity} 
+                                name="kd_purchasedetquantity" 
+                                id="kd_purchasedetquantity" 
+                                value={this.state.kd_purchasedetquantity} 
                                 onChange={this.handleChange}  
                                 />
                             </td>
@@ -180,9 +208,9 @@ var PurchaseDetsform2 = React.createClass({
                             <th>Total</th>
                             <td>
                                 <input 
-                                name="purchasedettotal" 
-                                id="purchasedettotal" 
-                                value={this.state.purchasedettotal} 
+                                name="kd_purchasedettotal" 
+                                id="kd_purchasedettotal" 
+                                value={this.state.kd_purchasedettotal} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -199,11 +227,11 @@ var PurchaseDetsform2 = React.createClass({
 var PurchaseDetsUpdateform = React.createClass({
     getInitialState: function () {
         return {
-            uppurchasedetid: "",
-            uppurchasedetpurchaseid: "",
-            upproductdata: [],
-            uppurchasedetquantity: "",
-            uppurchasedettotal: "",
+            kd_uppurchasedetid: "",
+            kd_uppurchasedetpurchaseid: "",
+            kd_upproductdata: [],
+            kd_uppurchasedetquantity: "",
+            kd_uppurchasedettotal: "",
         };
     },
     
@@ -213,7 +241,7 @@ var PurchaseDetsUpdateform = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({upproductdata:data});
+                this.setState({kd_upproductdata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -227,18 +255,18 @@ var PurchaseDetsUpdateform = React.createClass({
     handleUpSubmit: function (e) {
         e.preventDefault();
 
-        var uppurchasedetid = uppurdetid.value;
-        var uppurchasedetpurchaseid = uppurdetpurchaseid.value;
-        var uppurchasedetproduct = uppurdetproduct.value;
-        var uppurchasedetquantity = uppurdetquantity.value;
-        var uppurchasedettotal = uppurdettotal.value;
+        var kd_uppurchasedetid = kd_uppurdetid.value;
+        var kd_uppurchasedetpurchaseid = kd_uppurdetpurchaseid.value;
+        var kd_uppurchasedetproduct = uppurdetproduct.value;
+        var kd_uppurchasedetquantity = kd_uppurdetquantity.value;
+        var kd_uppurchasedettotal = kd_uppurdettotal.value;
 
         this.props.onUpdateSubmit({ 
-            uppurchasedetid: uppurchasedetid, 
-            uppurchasedetpurchaseid: uppurchasedetpurchaseid, 
-            uppurchasedetproduct: uppurchasedetproduct, 
-            uppurchasedetquantity: uppurchasedetquantity, 
-            uppurchasedettotal: uppurchasedettotal,
+            kd_uppurchasedetid: kd_uppurchasedetid, 
+            kd_uppurchasedetpurchaseid: kd_uppurchasedetpurchaseid, 
+            kd_uppurchasedetproduct: kd_uppurchasedetproduct, 
+            kd_uppurchasedetquantity: kd_uppurchasedetquantity, 
+            kd_uppurchasedettotal: kd_uppurchasedettotal,
         });
     },
     
@@ -253,9 +281,9 @@ var PurchaseDetsUpdateform = React.createClass({
                             <th>Purchase ID</th>
                             <td>
                                 <input 
-                                name="uppurdetpurchaseid" 
-                                id="uppurdetpurchaseid" 
-                                value={this.state.uppurdetpurchaseid} 
+                                name="kd_uppurdetpurchaseid" 
+                                id="kd_uppurdetpurchaseid" 
+                                value={this.state.kd_uppurdetpurchaseid} 
                                 onChange={this.handleUpChange}  
                                 />
                             </td>
@@ -263,16 +291,16 @@ var PurchaseDetsUpdateform = React.createClass({
                         <tr>
                             <th>Product</th>
                             <td>
-                                <ProductUpdateList data={this.state.upproductdata} />
+                                <ProductUpdateList data={this.state.kd_upproductdata} />
                             </td>
                         </tr>
                         <tr>
                             <th>Quantity</th>
                             <td>
                                 <input 
-                                name="uppurdetquantity" 
-                                id="uppurdetquantity" 
-                                value={this.state.uppurdetquantity} 
+                                name="kd_uppurdetquantity" 
+                                id="kd_uppurdetquantity" 
+                                value={this.state.kd_uppurdetquantity} 
                                 onChange={this.handleUpChange}  
                                 />
                             </td>
@@ -281,16 +309,16 @@ var PurchaseDetsUpdateform = React.createClass({
                             <th>Total</th>
                             <td>
                                 <input 
-                                name="uppurdettotal" 
-                                id="uppurdettotal" 
-                                value={this.state.uppurdettotal} 
+                                name="kd_uppurdettotal" 
+                                id="kd_uppurdettotal" 
+                                value={this.state.kd_uppurdettotal} 
                                 onChange={this.handleUpChange} 
                                 />
                             </td>
                         </tr>  
                     </tbody>
                 </table><br />
-                        <input type="hidden" name="uppurdetid" id="uppurdetid" onChange={this.handleUpChange} />
+                        <input type="hidden" name="kd_uppurdetid" id="kd_uppurdetid" onChange={this.handleUpChange} />
                         <input type="submit" value="Update Purchase Details" />
                     </form>
                 </div>
@@ -328,8 +356,8 @@ var PurchaseDetsList = React.createClass({
 var PurchaseDets = React.createClass({
     getInitialState: function () {
         return {
-            uppurdetid: "",
-            singledata: []
+            kd_uppurdetid: "",
+            kd_singledata: []
         };
     },
     updateRecord: function (e) {
@@ -342,19 +370,19 @@ var PurchaseDets = React.createClass({
         $.ajax({
             url: '/getsinglepurchasedets/',
             data: {
-                'uppurdetid': theuppurdetid
+                'kd_uppurdetid': theuppurdetid
             },
             dataType: 'json',
             cache: false,
             success: function (data) {
-                this.setState({ singledata: data });
-                console.log(this.state.singledata);
-                var populatePurchaseDets = this.state.singledata.map(function (purchasedetails) {
-                    uppurdetid.value = theuppurdetid;
-                    uppurdetpurchaseid.value = purchasedetails.purchaseID;
+                this.setState({ kd_singledata: data });
+                console.log(this.state.kd_singledata);
+                var populatePurchaseDets = this.state.kd_singledata.map(function (purchasedetails) {
+                    kd_uppurdetid.value = theuppurdetid;
+                    kd_uppurdetpurchaseid.value = purchasedetails.purchaseID;
                     uppurdetproduct.value = purchasedetails.productID;
-                    uppurdetquantity.value = purchasedetails.purchaseQuantity;
-                    uppurdettotal.value = purchasedetails.purchaseTotal;
+                    kd_uppurdetquantity.value = purchasedetails.purchaseQuantity;
+                    kd_uppurdettotal.value = purchasedetails.purchaseTotal;
 
                 });
             }.bind(this),

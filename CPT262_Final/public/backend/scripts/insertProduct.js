@@ -1,4 +1,25 @@
+var ususer = 0;
 var ProductBox = React.createClass({
+    getInitialState: function() {
+        return { viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
+    },
+    componentDidMount: function () {
+        this.loadAllowLogin();
+    }, 
     handleProductSubmit: function (product) {
         $.ajax({
             url: '/product/',
@@ -14,44 +35,53 @@ var ProductBox = React.createClass({
         });
     },
     render: function () {
-        return (
-            <div className="ProductBox">
-                <h1>Insert Product</h1>
-                <Productform2 onProductSubmit={this.handleProductSubmit}/>
-            </div>
-        );
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
+                </div>
+            );
+        } else { 
+            return (
+                <div className="ProductBox">
+                    <h1>Insert Product</h1>
+                    <Productform2 onProductSubmit={this.handleProductSubmit}/>
+                </div>
+            );
+        }
     }
 });
 
 var Productform2 = React.createClass({
     getInitialState: function () {
         return {
-            productname: "",
-            productquantity: "",
-            productprice: "",
+            kd_productname: "",
+            kd_productquantity: "",
+            kd_productprice: "",
         };
     },
 
     handleSubmit: function (e) {
         e.preventDefault(); 
         
-        var productname = this.state.productname.trim();
-        var productquantity = this.state.productquantity.trim();
-        var productprice = this.state.productprice.trim();
+        var kd_productname = this.state.kd_productname.trim();
+        var kd_productquantity = this.state.kd_productquantity.trim();
+        var kd_productprice = this.state.kd_productprice.trim();
 
         // validate data
-        if (!this.validateDollars(productprice)) {
-            console.log("Not Dollars" + productprice);
+        if (!this.validateDollars(kd_productprice)) {
+            console.log("Not Dollars" + kd_productprice);
             return;
         }
-        if (!productname || !productquantity || !productprice ) {
+        if (!kd_productname || !kd_productquantity || !kd_productprice ) {
             console.log("Field Missing");
             return;
         }
         this.props.onProductSubmit({ 
-            productname: productname,
-            productquantity: productquantity,
-            productprice: productprice,
+            kd_productname: kd_productname,
+            kd_productquantity: kd_productquantity,
+            kd_productprice: kd_productprice,
         });
     },
 
@@ -78,13 +108,13 @@ var Productform2 = React.createClass({
                             <th>Name</th>
                             <td>
                                 <TextInput
-                                    value={this.state.productname}
-                                    uniqueName="productname"
+                                    value={this.state.kd_productname}
+                                    uniqueName="kd_productname"
                                     textArea={false}
                                     required={true}
                                     minCharacters={2}
                                     validate={this.commonValidate}
-                                    onChange={this.setValue.bind(this, 'productname')}
+                                    onChange={this.setValue.bind(this, 'kd_productname')}
                                     errorMessage="Product Name is invalid"
                                     emptyMessage="Product Name is required" />
                             </td>
@@ -93,13 +123,13 @@ var Productform2 = React.createClass({
                             <th>Quantity</th>
                             <td>
                                 <TextInput
-                                    value={this.state.productquantity}
-                                    uniqueName="productquantity"
+                                    value={this.state.kd_productquantity}
+                                    uniqueName="kd_productquantity"
                                     textArea={false}
                                     required={true}
                                     minCharacters={1}
                                     validate={this.commonValidate}
-                                    onChange={this.setValue.bind(this, 'productquantity')}
+                                    onChange={this.setValue.bind(this, 'kd_productquantity')}
                                     errorMessage="Product Quantity is invalid"
                                     emptyMessage="Product Quantity is Required" />
                             </td>
@@ -109,12 +139,12 @@ var Productform2 = React.createClass({
                             <td>
 
                                 <TextInput
-                                    value={this.state.productprice}
-                                    uniqueName="productprice"
+                                    value={this.state.kd_productprice}
+                                    uniqueName="kd_productprice"
                                     textArea={false}
                                     required={true}
                                     validate={this.validateDollars}
-                                    onChange={this.setValue.bind(this, 'productprice')}
+                                    onChange={this.setValue.bind(this, 'kd_productprice')}
                                     errorMessage="Product Price is invalid"
                                     emptyMessage="Product Price is required" />
                             </td>

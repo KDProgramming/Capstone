@@ -1,16 +1,34 @@
+var ususer = 0;
 var PurchaseDetsBox = React.createClass({
     getInitialState: function () {
-        return { data: [] };
+        return { data: [], viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                if (data !== 0) {
+                    this.loadPurchaseDetsFromServer();
+                }
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
     },
     loadPurchaseDetsFromServer: function () {
         $.ajax({
             url: '/getpurchasedets/',
             data: {
-                'purchasedetid': purchasedetid.value,
-                'purchasedetpurchaseid': purchasedetpurchaseid.value,
-                'purchasedetproduct': purdetproduct.value,
-                'purchasedetquantity': purchasedetquantity.value,
-                'purchasedettotal': purchasedettotal.value,         
+                'kd_purchasedetid': kd_purchasedetid.value,
+                'kd_purchasedetpurchaseid': kd_purchasedetpurchaseid.value,
+                'kd_purchasedetproduct': purdetproduct.value,
+                'kd_purchasedetquantity': kd_purchasedetquantity.value,
+                'kd_purchasedettotal': kd_purchasedettotal.value,         
             },
             
             dataType: 'json',
@@ -26,41 +44,51 @@ var PurchaseDetsBox = React.createClass({
 
     },
     componentDidMount: function () {
+        this.loadAllowLogin();
         this.loadPurchaseDetsFromServer();
     },
 
     render: function () {
-        return (
-            <div>
-                <h1>Purchase Details</h1>
-                <PurchaseDetsform2 onPurchaseDetsSubmit={this.loadPurchaseDetsFromServer} />
-                <br />
-                <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Purchase ID</th>
-                                <th>Product</th>
-                                <th>Quantity</th>
-                                <th>Total</th>
-                            </tr>
-                         </thead>
-                        <PurchaseDetsList data={this.state.data} />
-                    </table>
-                
-            </div>
-        );
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
+                </div>
+            );
+        } else { 
+            return (
+                <div>
+                    <h1>Purchase Details</h1>
+                    <PurchaseDetsform2 onPurchaseDetsSubmit={this.loadPurchaseDetsFromServer} />
+                    <br />
+                    <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Purchase ID</th>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <PurchaseDetsList data={this.state.data} />
+                        </table>
+                    
+                </div>
+            );
+        }
     }
 });
 
 var PurchaseDetsform2 = React.createClass({
     getInitialState: function () {
         return {
-            purchasedetid: "",
-            purchasedetpurchaseid: "",
-            productdata: [],
-            purchasedetquantity: "",
-            purchasedettotal: "",
+            kd_purchasedetid: "",
+            kd_purchasedetpurchaseid: "",
+            kd_productdata: [],
+            kd_purchasedetquantity: "",
+            kd_purchasedettotal: "",
         };
     },
 
@@ -70,7 +98,7 @@ var PurchaseDetsform2 = React.createClass({
             dataType: 'json',
             cache: false,
             success: function(data) {
-                this.setState({productdata:data});
+                this.setState({kd_productdata:data});
             }.bind(this),
             error: function (xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -84,18 +112,18 @@ var PurchaseDetsform2 = React.createClass({
     handleSubmit: function (e) {
         e.preventDefault();
 
-        var purchasedetid = this.state.purchasedetid.trim();
-        var purchasedetpurchaseid = this.state.purchasedetpurchaseid.trim();
-        var purchasedetproduct = purdetproduct.value;
-        var purchasedetquantity = this.state.purchasedetquantity.trim();
-        var purchasedettotal = this.state.purchasedettotal.trim();
+        var kd_purchasedetid = this.state.kd_purchasedetid.trim();
+        var kd_purchasedetpurchaseid = this.state.kd_purchasedetpurchaseid.trim();
+        var kd_purchasedetproduct = purdetproduct.value;
+        var kd_purchasedetquantity = this.state.kd_purchasedetquantity.trim();
+        var kd_purchasedettotal = this.state.kd_purchasedettotal.trim();
 
         this.props.onPurchaseDetsSubmit({ 
-            purchasedetid: purchasedetid, 
-            purchasedetpurchaseid: purchasedetpurchaseid, 
-            purchasedetproduct: purchasedetproduct, 
-            purchasedetquantity: purchasedetquantity, 
-            purchasedettotal: purchasedettotal,
+            kd_purchasedetid: kd_purchasedetid, 
+            kd_purchasedetpurchaseid: kd_purchasedetpurchaseid, 
+            kd_purchasedetproduct: kd_purchasedetproduct, 
+            kd_purchasedetquantity: kd_purchasedetquantity, 
+            kd_purchasedettotal: kd_purchasedettotal,
         });
     },
 
@@ -117,9 +145,9 @@ var PurchaseDetsform2 = React.createClass({
                             <td>
                                 <input 
                                 type="text" 
-                                name="purchasedetid" 
-                                id="purchasedetid" 
-                                value={this.state.purchasedetid} 
+                                name="kd_purchasedetid" 
+                                id="kd_purchasedetid" 
+                                value={this.state.kd_purchasedetid} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -128,9 +156,9 @@ var PurchaseDetsform2 = React.createClass({
                             <th>Purchase ID</th>
                             <td>
                                 <input 
-                                name="purchasedetpurchaseid" 
-                                id="purchasedetpurchaseid" 
-                                value={this.state.purchasedetpurchaseid} 
+                                name="kd_purchasedetpurchaseid" 
+                                id="kd_purchasedetpurchaseid" 
+                                value={this.state.kd_purchasedetpurchaseid} 
                                 onChange={this.handleChange}  
                                 />
                             </td>
@@ -138,16 +166,16 @@ var PurchaseDetsform2 = React.createClass({
                         <tr>
                             <th>Product</th>
                             <td>
-                                <ProductList data={this.state.productdata} />
+                                <ProductList data={this.state.kd_productdata} />
                             </td>
                         </tr>
                         <tr>
                             <th>Quantity</th>
                             <td>
                                 <input 
-                                name="purchasedetquantity" 
-                                id="purchasedetquantity" 
-                                value={this.state.purchasedetquantity} 
+                                name="kd_purchasedetquantity" 
+                                id="kd_purchasedetquantity" 
+                                value={this.state.kd_purchasedetquantity} 
                                 onChange={this.handleChange}  
                                 />
                             </td>
@@ -156,9 +184,9 @@ var PurchaseDetsform2 = React.createClass({
                             <th>Total</th>
                             <td>
                                 <input 
-                                name="purchasedettotal" 
-                                id="purchasedettotal" 
-                                value={this.state.purchasedettotal} 
+                                name="kd_purchasedettotal" 
+                                id="kd_purchasedettotal" 
+                                value={this.state.kd_purchasedettotal} 
                                 onChange={this.handleChange} 
                                 />
                             </td>

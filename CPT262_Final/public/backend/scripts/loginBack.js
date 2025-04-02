@@ -38,8 +38,8 @@ var LoginBox = React.createClass({
 var LoginForm = React.createClass({
     getInitialState: function () {
         return {
-            useremail: "",
-            userpw: "",
+            kd_useremail: "",
+            kd_userpw: "",
 
         };
     },
@@ -47,12 +47,12 @@ var LoginForm = React.createClass({
     handleSubmit: function (e) {
         e.preventDefault();
 
-        var useremail = this.state.useremail.trim();
-        var userpw = this.state.userpw.trim();
+        var kd_useremail = this.state.kd_useremail.trim();
+        var kd_userpw = this.state.kd_userpw.trim();
       
         this.props.onLoginSubmit({
-            useremail: useremail,
-            userpw: userpw
+            kd_useremail: kd_useremail,
+            kd_userpw: kd_userpw
         });
 
     },
@@ -75,9 +75,9 @@ var LoginForm = React.createClass({
                                     <th>Email</th>
                                     <td>
                                         <input 
-                                        name="useremail" 
-                                        id="useremail" 
-                                        value={this.state.useremail} 
+                                        name="kd_useremail" 
+                                        id="kd_useremail" 
+                                        value={this.state.kd_useremail} 
                                         onChange={this.handleChange} />
                                     </td>
                                 </tr>
@@ -86,9 +86,9 @@ var LoginForm = React.createClass({
                                     <td>
                                         <input 
                                         type = "password" 
-                                        name="userpw" 
-                                        id="userpw" 
-                                        value={this.state.userpw} 
+                                        name="kd_userpw" 
+                                        id="kd_userpw" 
+                                        value={this.state.kd_userpw} 
                                         onChange={this.handleChange} />
                                     </td>
                                 </tr>

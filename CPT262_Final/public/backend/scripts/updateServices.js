@@ -1,15 +1,33 @@
+var ususer = 0;
 var ServicesBox = React.createClass({
     getInitialState: function () {
-        return { data: [] };
+        return { data: [], viewthepage: 0 };
+    },
+    loadAllowLogin: function () {
+        $.ajax({
+            url: '/getloggedinback/',
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({ viewthepage: data });
+                if (data !== 0) {
+                    this.loadServicesFromServer();
+                }
+                ususer = this.state.viewthepage;
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
     },
     loadServicesFromServer: function () {
         $.ajax({
             url: '/getservices/',
             data: {
-                'serviceid': serviceid.value,
-                'servicename': servicename.value,
-                'serviceblocks': serviceblocks.value,
-                'serviceprice': serviceprice.value,          
+                'kd_serviceid': kd_serviceid.value,
+                'kd_servicename': kd_servicename.value,
+                'kd_serviceblocks': kd_serviceblocks.value,
+                'kd_serviceprice': kd_serviceprice.value,          
             },
             
             dataType: 'json',
@@ -41,62 +59,72 @@ var ServicesBox = React.createClass({
         window.location.reload(true);
     },
     componentDidMount: function () {
+        this.loadAllowLogin();
         this.loadServicesFromServer();
     },
 
     render: function () {
-        return (
-            <div>
-                <h1>Update Service</h1>
-                <Servicesform2 onServicesSubmit={this.loadServicesFromServer} />
-                <br />
-                <div id = "theresults">
-                    <div id = "theleft">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Blocks</th>
-                                <th>Price</th>
-                                <th></th>
-                            </tr>
-                         </thead>
-                        <ServicesList data={this.state.data} />
-                    </table>
-                    </div>
-                    <div id="theright">
-                        <ServicesUpdateform onUpdateSubmit={this.updateSingleServiceFromServer} />
-                    </div>                
+        if (this.state.viewthepage == 0) {
+            return (
+                <div>
+                    <br/>Please Login!
+                    <br/><a href="index.html">Access Login Page Here</a>
                 </div>
-            </div>
-        );
+            );
+        } else { 
+            return (
+                <div>
+                    <h1>Update Service</h1>
+                    <Servicesform2 onServicesSubmit={this.loadServicesFromServer} />
+                    <br />
+                    <div id = "theresults">
+                        <div id = "theleft">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Blocks</th>
+                                    <th>Price</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <ServicesList data={this.state.data} />
+                        </table>
+                        </div>
+                        <div id="theright">
+                            <ServicesUpdateform onUpdateSubmit={this.updateSingleServiceFromServer} />
+                        </div>                
+                    </div>
+                </div>
+            );
+        }
     }
 });
 
 var Servicesform2 = React.createClass({
     getInitialState: function () {
         return {
-            serviceid: "",
-            servicename: "",
-            serviceblocks: "",
-            serviceprice: "",
+            kd_serviceid: "",
+            kd_servicename: "",
+            kd_serviceblocks: "",
+            kd_serviceprice: "",
         };
     },
 
     handleSubmit: function (e) {
         e.preventDefault();
 
-        var serviceid = this.state.serviceid.trim();
-        var servicename = this.state.servicename.trim();
-        var serviceblocks = this.state.serviceblocks.trim();
-        var serviceprice = this.state.serviceprice.trim();
+        var kd_serviceid = this.state.kd_serviceid.trim();
+        var kd_servicename = this.state.kd_servicename.trim();
+        var kd_serviceblocks = this.state.kd_serviceblocks.trim();
+        var kd_serviceprice = this.state.kd_serviceprice.trim();
 
         this.props.onServicesSubmit({ 
-            serviceid: serviceid, 
-            servicename: servicename, 
-            serviceblocks: serviceblocks, 
-            serviceprice: serviceprice,
+            kd_serviceid: kd_serviceid, 
+            kd_servicename: kd_servicename, 
+            kd_serviceblocks: kd_serviceblocks, 
+            kd_serviceprice: kd_serviceprice,
         });
     },
     handleChange: function (event) {
@@ -117,9 +145,9 @@ var Servicesform2 = React.createClass({
                             <td>
                                 <input 
                                 type="text" 
-                                name="serviceid" 
-                                id="serviceid" 
-                                value={this.state.serviceid} 
+                                name="kd_serviceid" 
+                                id="kd_serviceid" 
+                                value={this.state.kd_serviceid} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -128,9 +156,9 @@ var Servicesform2 = React.createClass({
                             <th>Service Name</th>
                             <td>
                                 <input 
-                                name="servicename" 
-                                id="servicename" 
-                                value={this.state.servicename} 
+                                name="kd_servicename" 
+                                id="kd_servicename" 
+                                value={this.state.kd_servicename} 
                                 onChange={this.handleChange}  
                                 />
                             </td>
@@ -139,9 +167,9 @@ var Servicesform2 = React.createClass({
                             <th>Service Blocks</th>
                             <td>
                                 <input 
-                                name="serviceblocks" 
-                                id="serviceblocks" 
-                                value={this.state.serviceblocks} 
+                                name="kd_serviceblocks" 
+                                id="kd_serviceblocks" 
+                                value={this.state.kd_serviceblocks} 
                                 onChange={this.handleChange} 
                                 />
                             </td>
@@ -150,9 +178,9 @@ var Servicesform2 = React.createClass({
                             <th>Service Price</th>
                             <td>
                                 <input 
-                                name="serviceprice" 
-                                id="serviceprice" 
-                                value={this.state.serviceprice} 
+                                name="kd_serviceprice" 
+                                id="kd_serviceprice" 
+                                value={this.state.kd_serviceprice} 
                                 onChange={this.handleChange}  
                                 />
                             </td>
@@ -169,26 +197,26 @@ var Servicesform2 = React.createClass({
 var ServicesUpdateform = React.createClass({
     getInitialState: function () {
         return {
-            upserviceid: "",
-            upservicename: "",
-            upserviceblocks: "",
-            upserviceprice: "",
+            kd_upserviceid: "",
+            kd_upservicename: "",
+            kd_upserviceblocks: "",
+            kd_upserviceprice: "",
         };
     },
     
     handleUpSubmit: function (e) {
         e.preventDefault();
 
-        var upserviceid = upservid.value;
-        var upservicename = upservname.value;
-        var upserviceblocks = upservblocks.value;
-        var upserviceprice = upservprice.value;
+        var kd_upserviceid = kd_upservid.value;
+        var kd_upservicename = kd_upservname.value;
+        var kd_upserviceblocks = kd_upservblocks.value;
+        var kd_upserviceprice = kd_upservprice.value;
 
         this.props.onUpdateSubmit({ 
-            upserviceid: upserviceid, 
-            upservicename: upservicename, 
-            upserviceblocks: upserviceblocks, 
-            upserviceprice: upserviceprice, 
+            kd_upserviceid: kd_upserviceid, 
+            kd_upservicename: kd_upservicename, 
+            kd_upserviceblocks: kd_upserviceblocks, 
+            kd_upserviceprice: kd_upserviceprice, 
         });
     },
     
@@ -203,9 +231,9 @@ var ServicesUpdateform = React.createClass({
                             <th>Name</th>
                             <td>
                                 <input 
-                                name="upservname" 
-                                id="upservname" 
-                                value={this.state.upservname} 
+                                name="kd_upservname" 
+                                id="kd_upservname" 
+                                value={this.state.kd_upservname} 
                                 onChange={this.handleUpChange}  
                                 />
                             </td>
@@ -214,9 +242,9 @@ var ServicesUpdateform = React.createClass({
                             <th>Blocks</th>
                             <td>
                                 <input 
-                                name="upservblocks" 
-                                id="upservblocks" 
-                                value={this.state.upservblocks} 
+                                name="kd_upservblocks" 
+                                id="kd_upservblocks" 
+                                value={this.state.kd_upservblocks} 
                                 onChange={this.handleUpChange} 
                                 />
                             </td>
@@ -225,16 +253,16 @@ var ServicesUpdateform = React.createClass({
                             <th>Price</th>
                             <td>
                                 <input 
-                                name="upservprice" 
-                                id="upservprice" 
-                                value={this.state.upservprice} 
+                                name="kd_upservprice" 
+                                id="kd_upservprice" 
+                                value={this.state.kd_upservprice} 
                                 onChange={this.handleUpChange}  
                                 />
                             </td>
                         </tr>
                     </tbody>
                 </table><br />
-                        <input type="hidden" name="upservid" id="upservid" onChange={this.handleUpChange} />
+                        <input type="hidden" name="kd_upservid" id="kd_upservid" onChange={this.handleUpChange} />
                         <input type="submit" value="Update Service" />
                     </form>
                 </div>
@@ -271,8 +299,8 @@ var ServicesList = React.createClass({
 var Services = React.createClass({
     getInitialState: function () {
         return {
-            upservid: "",
-            singledata: []
+            kd_upservid: "",
+            kd_singledata: []
         };
     },
     updateRecord: function (e) {
@@ -285,18 +313,18 @@ var Services = React.createClass({
         $.ajax({
             url: '/getsingleservice/',
             data: {
-                'upservid': theupservid
+                'kd_upservid': theupservid
             },
             dataType: 'json',
             cache: false,
             success: function (data) {
-                this.setState({ singledata: data });
-                console.log(this.state.singledata);
-                var populateService = this.state.singledata.map(function (service) {
-                    upservid.value = theupservid;
-                    upservname.value = service.serviceName;
-                    upservblocks.value = service.serviceBlocks;
-                    upservprice.value = service.servicePrice;
+                this.setState({ kd_singledata: data });
+                console.log(this.state.kd_singledata);
+                var populateService = this.state.kd_singledata.map(function (service) {
+                    kd_upservid.value = theupservid;
+                    kd_upservname.value = service.serviceName;
+                    kd_upservblocks.value = service.serviceBlocks;
+                    kd_upservprice.value = service.servicePrice;
 
                 });
             }.bind(this),
