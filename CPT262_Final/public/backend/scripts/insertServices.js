@@ -85,12 +85,17 @@ var Servicesform2 = React.createClass({
         var kd_serviceprice = this.state.kd_serviceprice.trim();
 
         if (!kd_servicename || !kd_serviceblocks || !kd_serviceprice) {
-            console.log("Field Missing");
+            alert("Field Missing");
             return;
         }
 
         if (kd_serviceblocks !== '1' && kd_serviceblocks !== '2') {
-            console.log("Service Blocks Must Be 1 or 2!");
+            alert("Service Blocks Must Be 1 or 2!");
+        }
+
+        if (isNaN(kd_serviceprice)) {
+            alert("Service Price Not A Number");
+            return;
         }
 
         this.props.onServicesSubmit({ 

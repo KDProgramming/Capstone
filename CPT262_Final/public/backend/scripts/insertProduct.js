@@ -78,6 +78,10 @@ var Productform2 = React.createClass({
             console.log("Field Missing");
             return;
         }
+        if (isNaN(kd_productquantity)) {
+            alert("Product Quantity Not A Number");
+            return;
+        }
         this.props.onProductSubmit({ 
             kd_productname: kd_productname,
             kd_productquantity: kd_productquantity,

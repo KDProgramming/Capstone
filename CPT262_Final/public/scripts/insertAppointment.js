@@ -111,6 +111,21 @@ var Appointmentform2 = React.createClass({
 
     handleSubmit: function (e) { 
         e.preventDefault();
+
+        const getHourFromDatetimeLocal = (datetimeStr) => {
+            return parseInt(datetimeStr.substring(11, 13), 10); // Extracts hour from "YYYY-MM-DDTHH:mm"
+        };
+        
+        const startHour = getHourFromDatetimeLocal(this.state.kd_appointmentstart);
+        const endHour = getHourFromDatetimeLocal(this.state.kd_appointmentend);
+        
+        if (startHour < 9 || startHour >= 17 || endHour < 9 || endHour >= 17) {
+            alert("Appointments must be between 9:00 AM and 5:00 PM.");
+            return;
+        }
+        
+
+        console.log("Submitting:", this.state);
         
         var kd_appointmentclient = apptclient.value;
         var kd_appointmentservice = apptservice.value;
@@ -131,9 +146,23 @@ var Appointmentform2 = React.createClass({
     },
 
     handleChange: function (event) {
+        const name = event.target.name;
+        const value = event.target.value;
+
+        if (name === "kd_appointmentstart" || name === "kd_appointmentend") {
+            const date = new Date(value);
+            const hours = date.getHours();
+
+            if (hours < 9 || hours >= 17) {
+                alert("Please select a time between 9:00 AM and 5:00 PM.");
+                return;
+            }
+        }
+
         this.setState({
-            [event.target.id]: event.target.value
+            [name]: value
         });
+        
     },
     setValue: function (field, event) {
         var object = {};
@@ -209,30 +238,25 @@ var Appointmentform2 = React.createClass({
 
 var SelectClient = React.createClass({
     render: function () {
-        var optionNodes = this.props.data.map(function (cliid) {
-            console.log("Current Client: " + cliuser)
-            var selValue = false;
-            if (cliuser == cliid.clientID) {
-                selValue = true;
-            }
-            return (
-                <option
-                    key={cliid.clientID}
-                    value={cliid.clientID}
-                    selected={selValue}
-                >
-                    {cliid.clientEmail}
-                </option>
-            );
+        const self = this;
+        const selectedClient = this.props.data.find(function (cliid) {
+            return cliuser == cliid.clientID;
         });
+
         return (
-            <select name="apptclient" id="apptclient">
-                <option value="">Select a Client</option>
-                {optionNodes}
+            <select name="apptclient" id="apptclient" disabled>
+                {selectedClient ? (
+                    <option value={selectedClient.clientID} selected>
+                        {selectedClient.clientEmail}
+                    </option>
+                ) : (
+                    <option value="">Client not found</option>
+                )}
             </select>
         );
     }
 });
+
 
 var SelectService = React.createClass({
     render: function () {

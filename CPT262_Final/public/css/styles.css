@@ -1,19 +1,48 @@
+@media (max-width: 768px) {
+    .wrapper {
+        flex-direction: column;
+        padding-bottom: 100px;
+    }
+    #theform, form {
+        width: 90%;
+        max-width: 100%;
+    }
+    .navbar {
+        flex-direction: column;
+        height: auto;
+    }
+    .nav-items {
+        flex-direction: column;
+    }
+    .bottomNavbar {
+        flex-direction: column;
+        height: auto;
+    }
+    .bottomNavItems {
+        flex-direction: column;
+    }
+}
+
 div {
+    flex-shrink: inherit;
     text-align: center;
     flex: 1;
 }
 
 .blocks {
+    flex-shrink: inherit;
     text-align: left;
 }
 
 #theform {
+    flex-shrink: inherit;
     flex: 1;
     padding: 20px;
     border-color: #000000;
     border-width: 5;
     position: relative;
     width: 50%;
+    max-width: 400px;
     height: 100%;
     box-sizing: border-box;
     justify-content: center;
@@ -21,6 +50,7 @@ div {
 }
 
 #theleft {
+    flex-shrink: inherit;
     flex: 1;
     float: left;
     padding-right: 20px;
@@ -29,6 +59,7 @@ div {
 }
 
 #theright {
+    flex-shrink: inherit;
     flex: 1;
     float: right;
     width: 100%;
@@ -36,11 +67,13 @@ div {
 }
 
 #theform, #theright, #theleft {
+    flex-shrink: inherit;
     width: 100%;
     max-width: 100%;
 }
 
 body {
+    flex-shrink: inherit;
     font-family: Arial, sans-serif;
     text-align: center;
     margin: 0;
@@ -52,12 +85,14 @@ body {
 }
 
 body, html {
+    flex-shrink: inherit;
     overflow-x: hidden;
     width: 100%;
     max-width: 100%;
 }
 
 .wrapper {
+    flex-shrink: inherit;
     display: flex;
     flex-direction: column;
     min-height: 100%;
@@ -66,14 +101,17 @@ body, html {
 }
 
 .content {
+    flex-shrink: inherit;
     flex: 1;
 }
 
 h1, h2 {
+    flex-shrink: inherit;
     margin-bottom: 20px;
 }
 
 #theresults {
+    flex-shrink: inherit;
     flex: 1;
     display: flex;
     justify-content: center;
@@ -83,6 +121,7 @@ h1, h2 {
 }
 
 form {
+    flex-shrink: inherit;
     flex: 1;
     background-image: url('../images/formBack.png');
     background-size: 100% 100%;
@@ -98,6 +137,7 @@ form {
 }
 
 table {
+    flex-shrink: inherit;
     flex: 1;
     width: 100%;
     border-collapse: collapse;
@@ -106,6 +146,7 @@ table {
 }
 
 table, th, td {
+    flex-shrink: inherit;
     flex: 1;
     padding: 10px;
     box-sizing: border-box;
@@ -113,15 +154,18 @@ table, th, td {
 }
 
 td {
+    flex-shrink: inherit;
     position: relative;
 }
 
 th {
+    flex-shrink: inherit;
     background-image: url('../images/navBack.png');
     border: 1px solid black;
 }
 
 input, select {
+    flex-shrink: inherit;
     flex: 1;
     width: 100%;
     padding: 8px;
@@ -132,6 +176,7 @@ input, select {
 }
 
 input[type="submit"] {
+    flex-shrink: inherit;
     flex: 1;
     background-image: url('../images/Button.png');
     background-size: 35% 100%;
@@ -151,6 +196,7 @@ input[type="submit"] {
 }
 
 .navbar {
+    flex-shrink: inherit;
     background-image: url('../images/navBack.png');
     background-size: contain; 
     background-position: center;
@@ -158,13 +204,13 @@ input[type="submit"] {
     display: flex;
     align-items: center;
     padding: 0 20px;
-    display: flex;
     font-family: 'Gabarito', sans-serif;
     font-size: large;
     justify-content: space-between;
 }
 
 .login-title {
+    flex-shrink: inherit;
     font-family: 'Gabarito', sans-serif;
     font-size: xx-large;
     text-decoration: underline;
@@ -172,22 +218,28 @@ input[type="submit"] {
 }
 
 nav .logo {
+    flex-shrink: inherit;
     height: 60px;
     width: auto;   
 }
 
 .nav-items {
+    flex-shrink: inherit;
     padding: 10px;
     align-items: center;
     justify-content: center;
+    flex-direction: row;
+    align-items: center;
 }
 
 .nav-item {
+    flex-shrink: inherit;
     display: inline-block;
     position: relative;
 }
 
 .nav-item > a {
+    flex-shrink: inherit;
     color: #000000;
     text-decoration: none;
     padding: 10px;
@@ -195,11 +247,13 @@ nav .logo {
 }
 
 .nav-item:hover .dropdown {
+    flex-shrink: inherit;
     display: block;
     color: #ff0fcb;
 }
 
 .navSearch {
+    flex-shrink: inherit;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -207,76 +261,82 @@ nav .logo {
 }
 
 .searchIcon {
+    flex-shrink: inherit;
     height: 30px;
     width: auto;  
     padding-right: 10px;
 }
 
 .searchBar {
+    flex-shrink: inherit;
     height: 40px;
     width: auto;  
 }
 
-
 .bottomNavbar {
+    flex-shrink: inherit;
     position: absolute;
     bottom: 0;
     width: 100%;
+    max-width: 100%;
     height: 140px;
     background-image: url('../images/NavBG.png');
     background-repeat: repeat-x;
-    background-size: cover;
+    background-size: contain;
     background-position: bottom;
-    z-index: 100;
 }
 
 .bottomNavItems {
-    display: flex;
-    width: 100%;
-    align-items: center;
+    flex-shrink: inherit;
+    flex-direction: row;
     justify-content: space-between;
     padding: 0 20px; 
 }
 
 .hgtcDiv {
-    padding-top: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    flex-shrink: inherit;
+    padding-top: 25px;
     flex-grow: 1;
+    position: absolute;
+    right: 20px;
 }
 
 .bottomTextDiv {
-    padding-top: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    flex-shrink: inherit;
+    padding-top: 20px;
     flex-grow: 1;
+    position: absolute;
 }
 
 nav .topText {
+    flex-shrink: inherit;
     padding-top: 20px;
     width: auto;
     height: 20px;
+    max-width: 100%;
 }
 
 nav .bottomText {
+    flex-shrink: inherit;
     padding-top: 50px;
     width: auto;
     height: 20px;
 }
 
 nav .hgtc {
+    flex-shrink: inherit;
     width: auto;
     height: 60px;
 }
 
 nav .navBG {
+    flex-shrink: inherit;
     height: 100%;
     width: auto;  
 }
 
 .dropdown {
+    flex-shrink: inherit;
     display: none;
     position: absolute;
     background-color: #ffffff;
@@ -285,6 +345,7 @@ nav .navBG {
 }
 
 .dropdown a {
+    flex-shrink: inherit;
     color: rgb(0, 0, 0);
     padding: 10px;
     display: block;
@@ -292,10 +353,12 @@ nav .navBG {
 }
 
 .dropdown a:hover {
+    flex-shrink: inherit;
     background-color: #ffafe7;
 }
 
 .decorative-image-container-CherryBlossom {
+    flex-shrink: inherit;
     position: absolute; 
     bottom: 0;              
     left: 0;            
@@ -305,6 +368,7 @@ nav .navBG {
 }
 
 .decorative-image-CherryBlossom {
+    flex-shrink: inherit;
     position: absolute;  
     bottom: 0;              
     left: 0;           
@@ -316,6 +380,7 @@ nav .navBG {
 }
 
 .decorative-image-container-CherryBlossom2 {
+    flex-shrink: inherit;
     position: absolute; 
     top: 0;              
     right: 0;            
@@ -325,6 +390,7 @@ nav .navBG {
 }
 
 .decorative-image-CherryBlossom2 {
+    flex-shrink: inherit;
     position: absolute;  
     top: 0;              
     right: 0;           

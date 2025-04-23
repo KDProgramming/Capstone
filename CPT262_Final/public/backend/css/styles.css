@@ -89,13 +89,37 @@ input[type="submit"] {
 
 nav {
     background-color: #333;
-    padding: 10px;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative; 
+    height: 65px;
+}
+
+.logo-container {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #fddff6;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.logo {
+    height: 60px;
+    width: auto;
+}
+
+.nav-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .nav-item {
-    display: inline-block;
     position: relative;
-    margin-right: 15px;
 }
 
 .nav-item > a {
@@ -103,6 +127,7 @@ nav {
     text-decoration: none;
     padding: 10px;
     display: block;
+    font-size: large;
 }
 
 .nav-item:hover .dropdown {

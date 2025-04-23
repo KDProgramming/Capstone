@@ -1,4 +1,18 @@
 var ususer = 0;
+
+function formatDate(datetimeStr) {
+    const date = new Date(datetimeStr);
+    const pad = (n) => n.toString().padStart(2, '0');
+
+    const yyyy = date.getFullYear();
+    const mm = pad(date.getMonth() + 1);
+    const dd = pad(date.getDate());
+    const hh = pad(date.getHours());
+    const min = pad(date.getMinutes());
+
+    return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+}
+
 var PurchasesBox = React.createClass({
     getInitialState: function () {
         return { data: [], viewthepage: 0 };
@@ -409,7 +423,7 @@ var Purchase = React.createClass({
                 var populatePurchase = this.state.kd_singledata.map(function (purchase) {
                     kd_uppurid.value = theuppurid;
                     uppuruser.value = purchase.userID;
-                    kd_uppurdate.value = purchase.purchaseDate;
+                    kd_uppurdate.value = formatDate(purchase.purchaseDate);
                     uppurstatus.value = purchase.purchaseStatusID;
                     kd_uppurtotal.value = purchase.purchaseTotal;
 

@@ -477,32 +477,32 @@ app.get('/getclient/', function (req, res) {
     }
 
     if (cfname) {
-        var fnameaddon = ' AND clientFirstName = ?'
-        var fnamaddonvar = cfname;
+        var fnameaddon = ' AND clientFirstName LIKE ?'
+        var fnamaddonvar = `%${cfname}%`;
     } else {
         var fnameaddon = ' AND clientFirstName LIKE ?'
         var fnamaddonvar = '%%'
     }
 
     if (clname) {
-        var lnameaddon = ' AND clientLastName = ?'
-        var lnameaddonvar = clname;
+        var lnameaddon = ' AND clientLastName LIKE ?'
+        var lnameaddonvar = `%${clname}%`;
     } else {
         var lnameaddon = ' AND clientLastName LIKE ?'
         var lnameaddonvar = '%%';
     }
 
     if (cphone) {
-        var phoneaddon = ' AND clientPhone = ?'
-        var phoneaddonvar = cphone;
+        var phoneaddon = ' AND clientPhone LIKE ?'
+        var phoneaddonvar = `%${cphone}%`;
     } else {
         var phoneaddon = ' AND clientPhone LIKE ?'
         var phoneaddonvar = '%%';
     }
 
     if (cemail) {
-        var emailaddon = ' AND clientEmail = ?'
-        var emailaddonvar = cemail;
+        var emailaddon = ' AND clientEmail LIKE ?'
+        var emailaddonvar = `%${cemail}%`;
     } else {
         var emailaddon = ' AND clientEmail LIKE ?'
         var emailaddonvar = '%%';
@@ -774,24 +774,24 @@ app.get('/getproduct/', function (req, res) {
     }
 
     if (pname) {
-        var nameaddon = ' AND productName = ?';
-        var nameaddonvar = pname;
+        var nameaddon = ' AND productName LIKE ?';
+        var nameaddonvar = `%${pname}%`;
     } else {
         var nameaddon = ' AND productName LIKE ?';
         var nameaddonvar = '%%';
     }
 
     if (pprice) {
-        var priceaddon = ' AND productPrice = ?';
-        var priceaddonvar = pprice;
+        var priceaddon = ' AND productPrice LIKE ?';
+        var priceaddonvar = `%${pprice}%`;
     } else {
         var priceaddon = ' AND productPrice LIKE ?';
         var priceaddonvar = '%%'
     }
 
     if (pquantity) {
-        var quantityaddon = ' AND productQuantity = ?';
-        var quantityaddonvar = pquantity;
+        var quantityaddon = ' AND productQuantity LIKE ?';
+        var quantityaddonvar = `%${pquantity}%`;
     } else {
         var quantityaddon = ' AND productQuantity LIKE ?';
         var quantityaddonvar = '%%';
@@ -1229,8 +1229,8 @@ app.get('/getuser/', function (req, res) {
     }
 
     if (uemail) {
-        var emailaddon = ' AND u.userEmail = ?';
-        var emailaddonvar = uemail;
+        var emailaddon = ' AND u.userEmail LIKE ?';
+        var emailaddonvar = `%${uemail}%`;
     } else {
         var emailaddon = ' AND u.userEmail LIKE ?';
         var emailaddonvar = '%%';
@@ -1353,8 +1353,8 @@ app.get('/getservices/', function (req, res) {
     }
 
     if (sname) {
-        var nameaddon = ' AND serviceName = ?';
-        var nameaddonvar = sname;
+        var nameaddon = ' AND serviceName LIKE ?';
+        var nameaddonvar = `%${sname}%`;
     } else {
         var nameaddon = ' AND serviceName LIKE ?';
         var nameaddonvar = '%%';
@@ -1369,8 +1369,8 @@ app.get('/getservices/', function (req, res) {
     }
 
     if (sprice) {
-        var priceaddon = ' AND servicePrice = ?';
-        var priceaddonvar = sprice;
+        var priceaddon = ' AND servicePrice LIKE ?';
+        var priceaddonvar = `%${sprice}%`;
     } else {
         var priceaddon = ' AND servicePrice LIKE ?';
         var priceaddonvar = '%%';

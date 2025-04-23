@@ -111,6 +111,21 @@ var Appointmentform2 = React.createClass({
 
     handleSubmit: function (e) { 
         e.preventDefault();
+
+        const start = new Date(this.state.kd_appointmentstart);
+        const end = new Date(this.state.kd_appointmentend);
+
+        const isValidTime = (date) => {
+            const hour = date.getHours();
+            return hour >= 9 && hour < 17;
+        };
+
+        if (!isValidTime(start) || !isValidTime(end)) {
+            alert("Appointments must be between 9:00 AM and 5:00 PM.");
+            return;
+        }
+
+        console.log("Submitting:", this.state);
         
         var kd_appointmentclient = apptclient.value;
         var kd_appointmentservice = apptservice.value;
@@ -131,6 +146,23 @@ var Appointmentform2 = React.createClass({
     },
 
     handleChange: function (event) {
+        const name = e.target.name;
+        const value = e.target.value;
+
+        if (name === "kd_appointmentstart" || name === "kd_appointmentend") {
+            const date = new Date(value);
+            const hours = date.getHours();
+
+            if (hours < 9 || hours >= 17) {
+                alert("Please select a time between 9:00 AM and 5:00 PM.");
+                return;
+            }
+        }
+
+        this.setState({
+            [name]: value
+        });
+
         this.setState({
             [event.target.id]: event.target.value
         });

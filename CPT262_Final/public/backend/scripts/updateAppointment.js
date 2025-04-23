@@ -1,4 +1,18 @@
 var ususer = 0;
+
+function formatDate(datetimeStr) {
+    const date = new Date(datetimeStr);
+    const pad = (n) => n.toString().padStart(2, '0');
+
+    const yyyy = date.getFullYear();
+    const mm = pad(date.getMonth() + 1);
+    const dd = pad(date.getDate());
+    const hh = pad(date.getHours());
+    const min = pad(date.getMinutes());
+
+    return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+}
+
 var AppointmentBox = React.createClass({
     getInitialState: function () {
         return { data: [], viewthepage: 0 };
@@ -167,6 +181,21 @@ var Appointmentform2 = React.createClass({
     handleSubmit: function (e) {
         e.preventDefault();
 
+        const start = new Date(this.state.kd_appointmentstart);
+        const end = new Date(this.state.kd_appointmentend);
+
+        const isValidTime = (date) => {
+            const hour = date.getHours();
+            return hour >= 9 && hour < 17;
+        };
+
+        if (!isValidTime(start) || !isValidTime(end)) {
+            alert("Appointments must be between 9:00 AM and 5:00 PM.");
+            return;
+        }
+
+        console.log("Submitting:", this.state);
+
         var kd_appointmentid = this.state.kd_appointmentid.trim();
         var kd_appointmentclient = apptclient.value;
         var kd_appointmentstart = this.state.kd_appointmentstart;
@@ -185,6 +214,23 @@ var Appointmentform2 = React.createClass({
     },
 
     handleChange: function (event) {
+        const name = e.target.name;
+        const value = e.target.value;
+
+        if (name === "kd_appointmentstart" || name === "kd_appointmentend") {
+            const date = new Date(value);
+            const hours = date.getHours();
+
+            if (hours < 9 || hours >= 17) {
+                alert("Please select a time between 9:00 AM and 5:00 PM.");
+                return;
+            }
+        }
+
+        this.setState({
+            [name]: value
+        });
+
         this.setState({
             [event.target.id]: event.target.value
         });
@@ -463,8 +509,8 @@ var Appointment = React.createClass({
                 var populateAppointment = this.state.kd_singledata.map(function (appointment) {
                     kd_upapptid.value = theupapptid;
                     upapptclient.value = appointment.clientID;
-                    kd_upapptstart.value = appointment.appointmentStart;
-                    kd_upapptend.value = appointment.appointmentEnd;
+                    kd_upapptstart.value = formatDate(appointment.appointmentStart);
+                    kd_upapptend.value = formatDate(appointment.appointmentEnd);
                     upapptservice.value = appointment.serviceID;
                     upapptstatus.value = appointment.appointmentStatusID;
                 
